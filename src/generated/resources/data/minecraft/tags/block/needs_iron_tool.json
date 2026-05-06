@@ -2,6 +2,8 @@
   "values": [
     "usefultoolsmod:rgoldblock",
     "usefultoolsmod:lblock",
-    "usefultoolsmod:hrblock"
+    "usefultoolsmod:hrblock",
+    "usefultoolsmod:hglow_block",
+    "usefultoolsmod:obshard_block"
   ]
 }

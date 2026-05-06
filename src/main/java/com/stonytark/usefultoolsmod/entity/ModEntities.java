@@ -1,14 +1,15 @@
 package com.stonytark.usefultoolsmod.entity;
 
+
+import net.minecraft.core.registries.BuiltInRegistries;
 import com.stonytark.usefultoolsmod.UsefultoolsMod;
 import com.stonytark.usefultoolsmod.entity.custom.GrenadeEntity;
 import com.stonytark.usefultoolsmod.entity.custom.GhostEntity;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.bus.api.IEventBus;
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =

@@ -8,6 +8,10 @@
     "usefultoolsmod:hred_chestplate",
     "usefultoolsmod:hred_leggings",
     "usefultoolsmod:hred_boots",
+    "usefultoolsmod:hglow_helmet",
+    "usefultoolsmod:hglow_chestplate",
+    "usefultoolsmod:hglow_leggings",
+    "usefultoolsmod:hglow_boots",
     "usefultoolsmod:obsidian_helmet",
     "usefultoolsmod:obsidian_chestplate",
     "usefultoolsmod:obsidian_leggings",
@@ -23,6 +27,18 @@
     "usefultoolsmod:rlapis_helmet",
     "usefultoolsmod:rlapis_chestplate",
     "usefultoolsmod:rlapis_leggings",
-    "usefultoolsmod:rlapis_boots"
+    "usefultoolsmod:rlapis_boots",
+    "usefultoolsmod:coal_helmet",
+    "usefultoolsmod:coal_chestplate",
+    "usefultoolsmod:coal_leggings",
+    "usefultoolsmod:coal_boots",
+    "usefultoolsmod:fni_helmet",
+    "usefultoolsmod:fni_chestplate",
+    "usefultoolsmod:fni_leggings",
+    "usefultoolsmod:fni_boots",
+    "usefultoolsmod:ecto_helmet",
+    "usefultoolsmod:ecto_chestplate",
+    "usefultoolsmod:ecto_leggings",
+    "usefultoolsmod:ecto_boots"
   ]
 }

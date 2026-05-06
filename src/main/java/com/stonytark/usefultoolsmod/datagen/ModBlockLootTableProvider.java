@@ -33,16 +33,27 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.SEMBLOCK.get());
         dropSelf(ModBlocks.SOBLOCK.get());
         dropSelf(ModBlocks.LBLOCK.get());
-        // dropSelf(ModBlocks.MAGIC_BLOCK.get());
+        dropSelf(ModBlocks.SPECTRAL_INFUSER.get());
+        dropSelf(ModBlocks.HGLOW_BLOCK.get());
+        dropSelf(ModBlocks.RAW_RGOLD_BLOCK.get());
+        dropSelf(ModBlocks.ECTOPLASM_BLOCK.get());
+        dropSelf(ModBlocks.REFINED_ECTOPLASM_BLOCK.get());
+        dropSelf(ModBlocks.HARDENED_COAL_BLOCK.get());
+        dropSelf(ModBlocks.COAL_DUST_BLOCK.get());
+        dropSelf(ModBlocks.OBSHARD_BLOCK.get());
+        dropSelf(ModBlocks.CALCIFIED_AMETHYST_BLOCK.get());
+        dropSelf(ModBlocks.GLACIAL_SHARD_BLOCK.get());
+        dropSelf(ModBlocks.POLISHED_QUARTZ_BLOCK.get());
+        dropSelf(ModBlocks.POLISHED_PRISMARINE_BLOCK.get());
 
         this.add(ModBlocks.RGOLDORE.get(),
-                block -> createOreDrop(ModBlocks.RGOLDORE.get(), ModItems.RGOLD.get()));
+                block -> createOreDrop(ModBlocks.RGOLDORE.get(), ModItems.RAW_RGOLD.get()));
         this.add(ModBlocks.RGOLD_NETHER_ORE.get(),
-                block -> createOreDrop(ModBlocks.RGOLD_NETHER_ORE.get(), ModItems.RGOLD.get()));
+                block -> createOreDrop(ModBlocks.RGOLD_NETHER_ORE.get(), ModItems.RAW_RGOLD.get()));
         this.add(ModBlocks.RGOLD_END_ORE.get(),
-                block -> createOreDrop(ModBlocks.RGOLD_END_ORE.get(), ModItems.RGOLD.get()));
+                block -> createOreDrop(ModBlocks.RGOLD_END_ORE.get(), ModItems.RAW_RGOLD.get()));
         this.add(ModBlocks.RGOLD_DEEPSLATE_ORE.get(),
-                block -> createOreDrop(ModBlocks.RGOLD_END_ORE.get(), ModItems.RGOLD.get()));
+                block -> createOreDrop(ModBlocks.RGOLD_DEEPSLATE_ORE.get(), ModItems.RAW_RGOLD.get()));
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block pBlock, Item item, float minDrops, float maxDrops) {
@@ -58,6 +69,6 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
-        return ModBlocks.BLOCKS.getEntries().stream().map(h -> (Block) h.get())::iterator;
+        return ModBlocks.BLOCKS.getEntries().stream().<Block>map(holder -> holder.get())::iterator;
     }
 }

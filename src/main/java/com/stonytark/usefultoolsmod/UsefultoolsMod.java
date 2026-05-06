@@ -2,11 +2,18 @@ package com.stonytark.usefultoolsmod;
 
 import com.mojang.logging.LogUtils;
 import com.stonytark.usefultoolsmod.block.ModBlocks;
+import com.stonytark.usefultoolsmod.block.entity.ModBlockEntityTypes;
+import com.stonytark.usefultoolsmod.block.entity.ModMenuTypes;
+import com.stonytark.usefultoolsmod.block.entity.SpectralInfuserMenu;
+import com.stonytark.usefultoolsmod.client.ClientConfigRegistration;
+import com.stonytark.usefultoolsmod.client.SpectralInfuserScreen;
 import com.stonytark.usefultoolsmod.entity.ModEntities;
 import com.stonytark.usefultoolsmod.entity.client.GhostRenderer;
 import com.stonytark.usefultoolsmod.item.ModCreativeModeTabs;
 import com.stonytark.usefultoolsmod.item.ModItems;
+import com.stonytark.usefultoolsmod.trigger.ModTriggers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -17,6 +24,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -42,6 +50,9 @@ public class UsefultoolsMod
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModBlockEntityTypes.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
+        ModTriggers.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         NeoForge.EVENT_BUS.register(this);
@@ -51,6 +62,11 @@ public class UsefultoolsMod
 
         // Register our mod's ModConfigSpec so that NeoForge can create and load the config file for us
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        // Cloth Config–backed in-game config screen (no-op when cloth_config isn't loaded)
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            ClientConfigRegistration.register(container);
+        }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -95,13 +111,19 @@ public class UsefultoolsMod
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents
     {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             EntityRenderers.register(ModEntities.GHOST.get(), GhostRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterMenuScreens(RegisterMenuScreensEvent event)
+        {
+            event.register(ModMenuTypes.SPECTRAL_INFUSER_MENU.get(), SpectralInfuserScreen::new);
         }
     }
 }

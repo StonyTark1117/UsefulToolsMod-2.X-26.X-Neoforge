@@ -50,11 +50,49 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     // Put repositories for dependencies here.
     // NeoGradle automatically adds the NeoForge maven and Maven Central for you.
+
+    // JEI
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+        content { includeGroup "mezz.jei" }
+    }
+
+    // WTHIT + badpackets
+    maven {
+        name = "bai's maven"
+        url = "https://maven2.bai.lol"
+        content {
+            includeGroup "lol.bai"
+            includeGroup "mcp.mobius.waila"
+        }
+    }
+
+    // Cloth Config
+    maven {
+        name = "shedaniel's maven"
+        url = "https://maven.shedaniel.me/"
+        content { includeGroup "me.shedaniel.cloth" }
+    }
 }
 
 dependencies {
     // Specify the version of NeoForge to use.
     implementation "net.neoforged:neoforge:${neo_version}"
+
+    // JEI — compile against API only, full jar at runtime
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // WTHIT — compile against API only, full jar at runtime
+    compileOnly "mcp.mobius.waila:wthit-api:neo-${wthit_version}"
+    runtimeOnly "mcp.mobius.waila:wthit:neo-${wthit_version}"
+    runtimeOnly "lol.bai:badpackets:neo-${badpackets_version}"
+
+    // Cloth Config — compile against full jar (API + impl), runtime jar at runtime
+    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    runtimeOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -71,7 +109,10 @@ tasks.named('processResources', ProcessResources).configure {
             mod_license            : mod_license,
             mod_version            : mod_version,
             mod_authors            : mod_authors,
-            mod_description        : mod_description
+            mod_description        : mod_description,
+            jei_version            : jei_version,
+            wthit_version          : wthit_version,
+            cloth_config_version   : cloth_config_version
     ]
     inputs.properties replaceProperties
 

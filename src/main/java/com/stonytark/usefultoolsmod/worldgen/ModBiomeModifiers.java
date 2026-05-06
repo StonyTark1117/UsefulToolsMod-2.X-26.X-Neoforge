@@ -9,7 +9,7 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.neoforged.neoforge.common.world.BiomeModifier;
@@ -24,6 +24,8 @@ public class ModBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_END_RGOLD_ORE = registerKey("add_end_rgold_ore");
 
     public static final ResourceKey<BiomeModifier> SPAWN_GHOST = registerKey("spawn_ghost");
+    public static final ResourceKey<BiomeModifier> SPAWN_GHOST_NETHER = registerKey("spawn_ghost_nether");
+    public static final ResourceKey<BiomeModifier> SPAWN_GHOST_END = registerKey("spawn_ghost_end");
 
 
     public static void bootstrap(BootstrapContext<BiomeModifier> context) {
@@ -45,11 +47,16 @@ public class ModBiomeModifiers {
                 HolderSet.direct(placedFeature.getOrThrow(ModPlacedFeatures.END_RGOLD_ORE_PLACED_KEY)),
                 GenerationStep.Decoration.UNDERGROUND_ORES));
 
-        context.register(SPAWN_GHOST, new BiomeModifiers.AddSpawnsBiomeModifier(
-                HolderSet.direct(biomes.getOrThrow(Biomes.BADLANDS), biomes.getOrThrow(Biomes.PLAINS), biomes.getOrThrow(Biomes.BAMBOO_JUNGLE), biomes.getOrThrow(Biomes.BASALT_DELTAS), biomes.getOrThrow(Biomes.BEACH), biomes.getOrThrow(Biomes.BIRCH_FOREST), biomes.getOrThrow(Biomes.CHERRY_GROVE), biomes.getOrThrow(Biomes.CRIMSON_FOREST), biomes.getOrThrow(Biomes.DARK_FOREST), biomes.getOrThrow(Biomes.DEEP_DARK), biomes.getOrThrow(Biomes.DESERT), biomes.getOrThrow(Biomes.DRIPSTONE_CAVES), biomes.getOrThrow(Biomes.END_BARRENS), biomes.getOrThrow(Biomes.END_HIGHLANDS), biomes.getOrThrow(Biomes.END_MIDLANDS), biomes.getOrThrow(Biomes.ERODED_BADLANDS), biomes.getOrThrow(Biomes.FLOWER_FOREST), biomes.getOrThrow(Biomes.FOREST), biomes.getOrThrow(Biomes.FROZEN_PEAKS), biomes.getOrThrow(Biomes.GROVE), biomes.getOrThrow(Biomes.ICE_SPIKES), biomes.getOrThrow(Biomes.JAGGED_PEAKS), biomes.getOrThrow(Biomes.JUNGLE), biomes.getOrThrow(Biomes.LUSH_CAVES), biomes.getOrThrow(Biomes.MANGROVE_SWAMP), biomes.getOrThrow(Biomes.MEADOW), biomes.getOrThrow(Biomes.MUSHROOM_FIELDS), biomes.getOrThrow(Biomes.NETHER_WASTES), biomes.getOrThrow(Biomes.OLD_GROWTH_BIRCH_FOREST), biomes.getOrThrow(Biomes.OLD_GROWTH_PINE_TAIGA), biomes.getOrThrow(Biomes.OLD_GROWTH_SPRUCE_TAIGA), biomes.getOrThrow(Biomes.SAVANNA), biomes.getOrThrow(Biomes.SAVANNA_PLATEAU),biomes.getOrThrow(Biomes.SMALL_END_ISLANDS), biomes.getOrThrow(Biomes.SNOWY_BEACH), biomes.getOrThrow(Biomes.SNOWY_PLAINS), biomes.getOrThrow(Biomes.SNOWY_SLOPES), biomes.getOrThrow(Biomes.SNOWY_TAIGA), biomes.getOrThrow(Biomes.SOUL_SAND_VALLEY), biomes.getOrThrow(Biomes.SPARSE_JUNGLE), biomes.getOrThrow(Biomes.STONY_PEAKS), biomes.getOrThrow(Biomes.STONY_SHORE), biomes.getOrThrow(Biomes.SUNFLOWER_PLAINS), biomes.getOrThrow(Biomes.SWAMP), biomes.getOrThrow(Biomes.TAIGA),biomes.getOrThrow(Biomes.THE_END), biomes.getOrThrow(Biomes.WARPED_FOREST), biomes.getOrThrow(Biomes.WINDSWEPT_FOREST), biomes.getOrThrow(Biomes.WINDSWEPT_GRAVELLY_HILLS), biomes.getOrThrow(Biomes.WINDSWEPT_HILLS), biomes.getOrThrow(Biomes.WINDSWEPT_SAVANNA), biomes.getOrThrow(Biomes.WOODED_BADLANDS)),
-                List.of(new MobSpawnSettings.SpawnerData(ModEntities.GHOST.get(), 10, 1, 1))));
+        // Ghost spawns in ALL biomes (overworld, nether, end) — spawn rules handle night propensity
+        HolderSet.Named<Biome> overworldBiomes = biomes.getOrThrow(BiomeTags.IS_OVERWORLD);
+        HolderSet.Named<Biome> netherBiomes = biomes.getOrThrow(BiomeTags.IS_NETHER);
+        HolderSet.Named<Biome> endBiomes = biomes.getOrThrow(BiomeTags.IS_END);
+        List<MobSpawnSettings.SpawnerData> ghostSpawn = List.of(
+                new MobSpawnSettings.SpawnerData(ModEntities.GHOST.get(), 20, 1, 1));
 
-
+        context.register(SPAWN_GHOST, new BiomeModifiers.AddSpawnsBiomeModifier(overworldBiomes, ghostSpawn));
+        context.register(SPAWN_GHOST_NETHER, new BiomeModifiers.AddSpawnsBiomeModifier(netherBiomes, ghostSpawn));
+        context.register(SPAWN_GHOST_END, new BiomeModifiers.AddSpawnsBiomeModifier(endBiomes, ghostSpawn));
     }
 
     private static ResourceKey<BiomeModifier> registerKey(String name) {

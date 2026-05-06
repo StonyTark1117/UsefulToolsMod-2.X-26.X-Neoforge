@@ -18,6 +18,8 @@ public class ModTags {
      public static TagKey<Block> INCORRECT_RLAPIS_TOOL = createTag("incorrect_rlapis_tool");
      public static TagKey<Block> NEEDS_HRED_TOOL = createTag("needs_hred_tool");
      public static TagKey<Block> INCORRECT_HRED_TOOL = createTag("incorrect_hred_tool");
+     public static TagKey<Block> NEEDS_HGLOW_TOOL = createTag("needs_hglow_tool");
+     public static TagKey<Block> INCORRECT_HGLOW_TOOL = createTag("incorrect_hglow_tool");
      public static TagKey<Block> NEEDS_JEM_TOOL = createTag("needs_jem_tool");
      public static TagKey<Block> INCORRECT_JEM_TOOL = createTag("incorrect_jem_tool");
      public static TagKey<Block> NEEDS_SEM_TOOL = createTag("needs_sem_tool");
@@ -28,6 +30,8 @@ public class ModTags {
      public static TagKey<Block> INCORRECT_JOB_TOOL = createTag("incorrect_job_tool");
      public static TagKey<Block> NEEDS_OP_TOOL = createTag("needs_op_tool");
      public static TagKey<Block> INCORRECT_OP_TOOL = createTag("incorrect_op_tool");
+     public static TagKey<Block> NEEDS_ECTO_TOOL = createTag("needs_ecto_tool");
+     public static TagKey<Block> INCORRECT_ECTO_TOOL = createTag("incorrect_ecto_tool");
 
      private static TagKey<Block> createTag(String name) {
          return BlockTags.create(ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, name));

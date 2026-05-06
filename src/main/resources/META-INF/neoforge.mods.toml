@@ -17,6 +17,10 @@ displayName="${mod_name}" #mandatory
 logoFile="grenade.png" #optional
 # A text field displayed in the mod UI
 authors="${mod_authors}" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+displayURL="https://www.curseforge.com/minecraft/mc-mods/the-useful-tools-mod" #optional
+# A URL to refer people to when problems occur with this mod
+issueTrackerURL="https://github.com/StonyTark1117/UsefulToolsMod-2.X-Neoforge/issues" #optional
 # The description text for the mod (multi line!)
 description='''${mod_description}'''
 
@@ -37,3 +41,27 @@ description='''${mod_description}'''
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+
+# Optional integration: JEI
+[[dependencies.${mod_id}]]
+    modId="jei"
+    type="optional"
+    versionRange="[19.0.0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+# Optional integration: WTHIT (mod id is "waila")
+[[dependencies.${mod_id}]]
+    modId="waila"
+    type="optional"
+    versionRange="[12.0.0,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Optional integration: Cloth Config (in-game config screen)
+[[dependencies.${mod_id}]]
+    modId="cloth_config"
+    type="optional"
+    versionRange="[15.0.0,)"
+    ordering="AFTER"
+    side="CLIENT"
