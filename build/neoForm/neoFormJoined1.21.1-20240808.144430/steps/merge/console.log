@@ -1,8 +1,0 @@
-JVM Args:          
-Run Args:          "--client", "/home/braydon/Useful-Tools/UsefulToolsMod-2.X-Neoforge/build/neoForm/neoFormJoined1.21.1-20240808.144430/steps/stripClient/output.jar", "--server", "/home/braydon/Useful-Tools/UsefulToolsMod-2.X-Neoforge/build/neoForm/neoFormJoined1.21.1-20240808.144430/steps/stripServer/output.jar", "--ann", "1.21.1", "--output", "/home/braydon/Useful-Tools/UsefulToolsMod-2.X-Neoforge/build/neoForm/neoFormJoined1.21.1-20240808.144430/steps/merge/output.jar", "--inject", "false"
-JVM:               /usr/lib/jvm/java-21-openjdk/bin/java
-Classpath:         /home/braydon/.gradle/caches/modules-2/files-2.1/net.neoforged/mergetool/2.0.3/85c096b0155715275f84922d41462484c9a0285c/mergetool-2.0.3-fatjar.jar
-Working Dir:       /home/braydon/Useful-Tools/UsefulToolsMod-2.X-Neoforge/build/neoForm/neoFormJoined1.21.1-20240808.144430/steps/merge
-Main Class:        net.neoforged.mergetool.ConsoleMerger
-Program log file:  /home/braydon/Useful-Tools/UsefulToolsMod-2.X-Neoforge/build/neoForm/neoFormJoined1.21.1-20240808.144430/steps/merge/log.log
-Output file:       /home/braydon/Useful-Tools/UsefulToolsMod-2.X-Neoforge/build/neoForm/neoFormJoined1.21.1-20240808.144430/steps/merge/output.jar

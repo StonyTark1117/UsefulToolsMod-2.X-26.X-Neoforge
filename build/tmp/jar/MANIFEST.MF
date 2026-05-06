@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Specification-Title: usefultoolsmod
-Specification-Vendor: stonytark_mkii
-Specification-Version: 1
-Implementation-Title: UsefulToolsMod-2.X-Neoforge
-Implementation-Version: 2.1.01-1.21.1-neoforge
-Implementation-Vendor: stonytark_mkii
-
