@@ -136,5 +136,20 @@ public class ModBlockTagProvider extends BlockTagsProvider {
 
         tag(ModTags.Blocks.NEEDS_RECTO_TOOL);
         tag(ModTags.Blocks.INCORRECT_RECTO_TOOL);
+
+        // Magnetization addon: ores and iron-bearing storage blocks the
+        // Magnetic Excavator can rip out of the ground. LBLOCK/SEMBLOCK/
+        // SOBLOCK are 9× of an iron-bearing composite ingot
+        // (RLAPIS/SEM/OBINGOT respectively), so they qualify too.
+        tag(ModTags.Blocks.MAGNETIZATION_FERROMAGNETIC)
+                .add(ModBlocks.RGOLDORE.get())
+                .add(ModBlocks.RGOLD_DEEPSLATE_ORE.get())
+                .add(ModBlocks.RGOLD_NETHER_ORE.get())
+                .add(ModBlocks.RGOLD_END_ORE.get())
+                .add(ModBlocks.RGOLDBLOCK.get())
+                .add(ModBlocks.RAW_RGOLD_BLOCK.get())
+                .add(ModBlocks.LBLOCK.get())
+                .add(ModBlocks.SEMBLOCK.get())
+                .add(ModBlocks.SOBLOCK.get());
     }
 }

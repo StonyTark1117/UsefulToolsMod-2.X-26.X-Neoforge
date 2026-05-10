@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.Block;
 
 
 public class ModTags {
+ public static final String MAGNETIZATION_ID = "magnetization";
+
  public static class Blocks {
      public static TagKey<Block> NEEDS_RGOLD_TOOL = createTag("needs_rgold_tool");
      public static TagKey<Block> INCORRECT_RGOLD_TOOL = createTag("incorrect_rgold_tool");
@@ -35,6 +37,10 @@ public class ModTags {
      public static TagKey<Block> NEEDS_RECTO_TOOL = createTag("needs_recto_tool");
      public static TagKey<Block> INCORRECT_RECTO_TOOL = createTag("incorrect_recto_tool");
 
+     // Magnetization addon: blocks the Magnetic Excavator tears out of the ground.
+     public static TagKey<Block> MAGNETIZATION_FERROMAGNETIC =
+             BlockTags.create(ResourceLocation.fromNamespaceAndPath(MAGNETIZATION_ID, "ferromagnetic_blocks"));
+
      private static TagKey<Block> createTag(String name) {
          return BlockTags.create(ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, name));
      }
@@ -42,6 +48,15 @@ public class ModTags {
 
  public static class Items {
 
+     // Magnetization addon tags. Items in these tags participate in the
+     // Magnetization mod's magnet field interactions when that mod is loaded;
+     // when it isn't loaded, the tags simply don't resolve and have no effect.
+     public static TagKey<Item> MAGNETIZATION_FERROMAGNETIC =
+             ItemTags.create(ResourceLocation.fromNamespaceAndPath(MAGNETIZATION_ID, "ferromagnetic"));
+     public static TagKey<Item> MAGNETIZATION_METAL_ARMOR =
+             ItemTags.create(ResourceLocation.fromNamespaceAndPath(MAGNETIZATION_ID, "metal_armor"));
+     public static TagKey<Item> MAGNETIZATION_METAL_TOOLS =
+             ItemTags.create(ResourceLocation.fromNamespaceAndPath(MAGNETIZATION_ID, "metal_tools"));
 
      private static TagKey<Item> createTag(String name) {
          return ItemTags.create(ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, name));

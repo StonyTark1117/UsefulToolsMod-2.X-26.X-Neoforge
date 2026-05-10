@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.3-1.21.1-neoforge
+
+### Added
+- **Magnetization addon compatibility** — when the optional Magnetization addon is installed, this mod's iron-bearing items, ores, armor, and tools now participate in its magnetic field interactions via the `magnetization:ferromagnetic`, `magnetization:metal_armor`, `magnetization:metal_tools`, and `magnetization:ferromagnetic_blocks` tags. Inclusion criterion: any set whose recipe chain transitively contains iron — including composite ingots like `RGOLD`, `RLAPIS`, `SEM`, and `OBINGOT` which all use iron nuggets or ingots.
+  - Ferromagnetic items: `rgold`, `raw_rgold`, `obingot`, `rlapis`, `sem`
+  - Metal armor: copper, rgold, obsidian, fni (Flint-Iron), rlapis, emerald, overpower full sets
+  - Metal tools: copper, rgold, pobsidian, fni, rraw_iron, rraw_copper, rraw_gold, rraw_rgold, rscrap, rlapis, pemerald full tool sets, plus overpower sword/pickaxe/axe/shovel
+  - Ferromagnetic blocks: all four `rgold` ore variants (overworld/deepslate/nether/end), `rgoldblock`, `raw_rgold_block`, `lblock`, `semblock`, `soblock`
+  - Tag JSONs are emitted unconditionally; they're inert when Magnetization isn't installed, so no runtime gate is needed. Magnetization is listed as an `optional` dependency in `neoforge.mods.toml` for metadata clarity.
+
 ## 2.2.2-1.21.1-neoforge
 
 Parity sync with the 2.2.2 Fabric release. All fixes mirror the Fabric variant.
