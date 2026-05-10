@@ -476,11 +476,13 @@ public class ModEvents {
     // Ghost spawn gating
     // -----------------------------------------------------------------------
 
+    // Kill-switch: drop any Ghost that would finalize when ghosts are disabled.
+    // Natural-spawn rate is enforced by GhostEntity.checkGhostSpawnRules, which
+    // only runs for natural spawning — spawn eggs / /summon / breeding bypass it.
     @SubscribeEvent
     public static void onFinalizeSpawn(FinalizeSpawnEvent event) {
         if (!(event.getEntity() instanceof GhostEntity)) return;
-        if (!Config.ghostEnabled
-                || event.getLevel().getRandom().nextDouble() > Config.ghostSpawnChance) {
+        if (!Config.ghostEnabled) {
             event.setSpawnCancelled(true);
         }
     }
@@ -894,8 +896,13 @@ public class ModEvents {
         if (EctoplasmInfusionHelper.isInfused(stack)) {
             tips.add(Component.translatable("tooltip.usefultoolsmod.ectoplasm_infused")
                     .withStyle(ChatFormatting.DARK_AQUA));
-            tips.add(Component.translatable("tooltip.usefultoolsmod.ecto_can_damage_ghosts")
-                    .withStyle(ChatFormatting.GRAY));
+            if (stack.getItem() instanceof ArmorItem) {
+                tips.add(Component.translatable("tooltip.usefultoolsmod.ecto_armor_invisibility")
+                        .withStyle(ChatFormatting.GRAY));
+            } else {
+                tips.add(Component.translatable("tooltip.usefultoolsmod.ecto_can_damage_ghosts")
+                        .withStyle(ChatFormatting.GRAY));
+            }
             if (stack.getItem() instanceof PickaxeItem) {
                 tips.add(Component.translatable("tooltip.usefultoolsmod.spectral_sight")
                         .withStyle(ChatFormatting.GRAY));

@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
+  "category": "equipment",
   "key": {
-    "B": {
-      "item": "minecraft:gunpowder"
-    },
     "A": {
       "item": "minecraft:iron_ingot"
+    },
+    "B": {
+      "item": "minecraft:gunpowder"
     },
     "C": {
       "item": "minecraft:redstone"

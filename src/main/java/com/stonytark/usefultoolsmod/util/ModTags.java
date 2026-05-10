@@ -32,6 +32,8 @@ public class ModTags {
      public static TagKey<Block> INCORRECT_OP_TOOL = createTag("incorrect_op_tool");
      public static TagKey<Block> NEEDS_ECTO_TOOL = createTag("needs_ecto_tool");
      public static TagKey<Block> INCORRECT_ECTO_TOOL = createTag("incorrect_ecto_tool");
+     public static TagKey<Block> NEEDS_RECTO_TOOL = createTag("needs_recto_tool");
+     public static TagKey<Block> INCORRECT_RECTO_TOOL = createTag("incorrect_recto_tool");
 
      private static TagKey<Block> createTag(String name) {
          return BlockTags.create(ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, name));

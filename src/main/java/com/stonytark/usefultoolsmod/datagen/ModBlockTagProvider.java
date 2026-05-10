@@ -134,5 +134,7 @@ public class ModBlockTagProvider extends BlockTagsProvider {
         tag(ModTags.Blocks.INCORRECT_ECTO_TOOL)
                 .addTag(BlockTags.INCORRECT_FOR_IRON_TOOL);
 
+        tag(ModTags.Blocks.NEEDS_RECTO_TOOL);
+        tag(ModTags.Blocks.INCORRECT_RECTO_TOOL);
     }
 }

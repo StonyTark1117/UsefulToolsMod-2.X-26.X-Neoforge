@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
+  "category": "equipment",
   "key": {
-    "B": {
-      "item": "minecraft:string"
-    },
     "A": {
       "item": "minecraft:paper"
+    },
+    "B": {
+      "item": "minecraft:string"
     },
     "C": {
       "item": "usefultoolsmod:grenade"

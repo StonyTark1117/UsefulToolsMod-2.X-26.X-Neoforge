@@ -111,11 +111,16 @@ public class GhostEntity extends Animal {
 
     public static boolean checkGhostSpawnRules(EntityType<? extends Animal> type, LevelAccessor level,
                                                MobSpawnType reason, BlockPos pos, RandomSource random) {
-        // Allow spawning anywhere — no block or light restrictions.
+        // Honor config kill-switch and natural-spawn rate. Only natural spawns
+        // run this predicate — spawn eggs / /summon / breeding bypass it, so
+        // those paths always succeed regardless of ghostSpawnChance.
+        if (!com.stonytark.usefultoolsmod.Config.ghostEnabled) return false;
+        if (random.nextDouble() > com.stonytark.usefultoolsmod.Config.ghostSpawnChance) return false;
+
+        // Allow spawning anywhere — no block restrictions.
         // Night-time propensity: 3× more likely at night (light level 0-3) vs daytime.
         int skyLight = level.getMaxLocalRawBrightness(pos);
         if (skyLight > 3) {
-            // Daytime / bright area — only 1-in-3 attempts succeed
             return random.nextInt(3) == 0;
         }
         return true;

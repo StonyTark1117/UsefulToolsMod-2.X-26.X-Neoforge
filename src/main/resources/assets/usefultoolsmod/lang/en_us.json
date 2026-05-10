@@ -793,6 +793,7 @@
   "tooltip.usefultoolsmod.fni_full_set": "Full Set: Fire on you burns out ~2x faster",
 
   "tooltip.usefultoolsmod.ecto_can_damage_ghosts": "Can damage Ghosts",
+  "tooltip.usefultoolsmod.ecto_armor_invisibility": "Hides you from Ghosts",
   "tooltip.usefultoolsmod.ecto_header": "Spectral",
   "tooltip.usefultoolsmod.ecto_ghost_avoid": "Ghosts will avoid you",
   "tooltip.usefultoolsmod.ecto_wall_phase": "Full Set: Sneak toward a wall to phase through it (3 blocks max)",

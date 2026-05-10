@@ -15,21 +15,25 @@ public final class EctoplasmArmorHelper {
 
     /**
      * Returns true if the player is "ghost-invisible" — ghosts will ignore them.
-     * Condition: full set of ecto armor material, OR all 4 armor slots filled with ectoplasm-infused armor.
+     * Each of the 4 armor slots must be either native Spectral (ecto) armor OR an
+     * ectoplasm-infused piece. Mix and match is allowed.
      */
     public static boolean isGhostInvisible(Player player) {
-        // Check for full ecto armor set (native ecto material)
-        if (hasFullEctoArmorSet(player)) return true;
-
-        // Check if ALL 4 armor slots are filled AND infused (any armor type, including modded)
-        int slotCount = 0;
+        int count = 0;
         for (ItemStack armorStack : player.getArmorSlots()) {
-            if (armorStack.isEmpty() || !EctoplasmInfusionHelper.isInfused(armorStack)) {
-                return false;
-            }
-            slotCount++;
+            if (armorStack.isEmpty()) return false;
+            if (!isSpectralOrInfused(armorStack)) return false;
+            count++;
         }
-        return slotCount == 4;
+        return count == 4;
+    }
+
+    public static boolean isSpectralOrInfused(ItemStack stack) {
+        if (stack.getItem() instanceof ArmorItem armor
+                && ModArmorMaterials.ECTO_ARMOR_MATERIAL.is(armor.getMaterial())) {
+            return true;
+        }
+        return EctoplasmInfusionHelper.isInfused(stack);
     }
 
     public static boolean hasFullEctoArmorSet(Player player) {

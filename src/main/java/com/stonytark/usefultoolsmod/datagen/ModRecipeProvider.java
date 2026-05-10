@@ -1854,6 +1854,23 @@ public class ModRecipeProvider extends RecipeProvider {
         stoneVariantTools(pRecipeOutput, ModItems.CRIMSON_SWORD.get(), ModItems.CRIMSON_PICKAXE.get(), ModItems.CRIMSON_SHOVEL.get(), ModItems.CRIMSON_AXE.get(), ModItems.CRIMSON_HOE.get(), Items.CRIMSON_PLANKS);
         stoneVariantTools(pRecipeOutput, ModItems.WARPED_SWORD.get(), ModItems.WARPED_PICKAXE.get(), ModItems.WARPED_SHOVEL.get(), ModItems.WARPED_AXE.get(), ModItems.WARPED_HOE.get(), Items.WARPED_PLANKS);
 
+        // -----------------------------------------------------------------
+        // Grenade & Dynamite
+        // -----------------------------------------------------------------
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.GRENADE.get())
+                .pattern("ACA").pattern("ABA").pattern("ADA")
+                .define('A', Items.IRON_INGOT)
+                .define('B', Items.GUNPOWDER)
+                .define('C', Items.REDSTONE)
+                .define('D', Items.PAPER)
+                .unlockedBy(getHasName(Items.GUNPOWDER), has(Items.GUNPOWDER)).save(pRecipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.DYNAMITE.get())
+                .pattern(" B ").pattern("CBC").pattern(" A ")
+                .define('A', Items.PAPER)
+                .define('B', Items.STRING)
+                .define('C', ModItems.GRENADE.get())
+                .unlockedBy(getHasName(ModItems.GRENADE.get()), has(ModItems.GRENADE.get())).save(pRecipeOutput);
     }
 
     private static void stoneVariantTools(RecipeOutput out, ItemLike sword, ItemLike pickaxe, ItemLike shovel, ItemLike axe, ItemLike hoe, ItemLike material) {
