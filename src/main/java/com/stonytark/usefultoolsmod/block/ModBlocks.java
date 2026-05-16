@@ -126,7 +126,12 @@ public class ModBlocks {
     private static <T extends Block> void registerBlockItem(String name, DeferredHolder<Block, T> block) {
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM,
                 Identifier.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, name));
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties().setId(itemKey)));
+        // useBlockDescriptionPrefix(): in 26.1 Item.Properties defaults its descriptionId to
+        // "item.<modid>.<path>". BlockItems need the "block." prefix to pick up the block's
+        // lang entry — otherwise the inventory tooltip falls back to the raw key.
+        ModItems.ITEMS.register(name, () ->
+                new BlockItem(block.get(),
+                        new Item.Properties().useBlockDescriptionPrefix().setId(itemKey)));
     }
 
     public static void register(IEventBus eventBus) {

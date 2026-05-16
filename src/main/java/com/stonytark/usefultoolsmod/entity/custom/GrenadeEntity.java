@@ -17,10 +17,11 @@ public class GrenadeEntity extends ThrowableItemProjectile {
     }
 
     public GrenadeEntity(EntityType<? extends GrenadeEntity> type, Level level, LivingEntity thrower) {
-        // 1.21.5+: ThrowableItemProjectile's 3-arg (type, thrower, level) constructor was removed.
-        // Use the 2-arg ctor + setOwner so the thrower is still attributed.
-        super(type, level);
-        this.setOwner(thrower);
+        // 1.21.5+: ThrowableItemProjectile's old (type, thrower, level) ctor was replaced with
+        // (type, thrower, level, itemStack). The 4-arg form also positions the entity at the
+        // thrower's eyes and sets the visual ItemStack — without it the grenade spawns at
+        // world origin (0,0,0) and never reaches the player's view.
+        super(type, thrower, level, new net.minecraft.world.item.ItemStack(ModItems.GRENADE.get()));
     }
 
     @Override

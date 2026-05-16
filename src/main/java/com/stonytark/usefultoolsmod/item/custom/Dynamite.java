@@ -1,7 +1,5 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -24,10 +22,9 @@ public class Dynamite extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        // Play fuse sound
-        level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.TNT_PRIMED, SoundSource.PLAYERS,
-                0.7F, 0.8F + level.getRandom().nextFloat() * 0.2F);
+        // No fuse-priming sound: dynamite explodes instantly (level.explode() below already
+        // emits its own boom). The vanilla TNT_PRIMED event is the long fuse-hiss loop, which
+        // would outlast the explosion and arrive at the player's ears after the boom.
 
         // Spawn smoke particles (client-side only)
         if (level.isClientSide()) {
