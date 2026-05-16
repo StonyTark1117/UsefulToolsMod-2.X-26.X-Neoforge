@@ -1,15 +1,18 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 
-public class CakeSwordItem extends SwordItem {
+/**
+ * Cake-flavored sword: eating it shrinks the stack by 1 in addition to whatever the default
+ * (component-driven) eating behavior does.
+ */
+public class CakeSwordItem extends Item {
 
-    public CakeSwordItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public CakeSwordItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

@@ -64,14 +64,29 @@ public class UsefultoolsMod
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         // Cloth Config–backed in-game config screen (no-op when cloth_config isn't loaded)
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        // 1.21.5+: FMLEnvironment.dist field replaced by FMLEnvironment.getDist() method.
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
             ClientConfigRegistration.register(container);
         }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
+        event.enqueueWork(() -> {
+            // Just Enough Resources: register our ore worldgen distributions
+            // so they show up in JER's WorldGen tab. JER's @JERPlugin scanner
+            // is broken on NeoForge, so we register directly against
+            // JERAPI.getInstance() during common setup. The isLoaded gate
+            // keeps UsefulToolsJerPlugin (and its JER imports) unloaded
+            // when JER isn't installed.
+            // NOTE: temporarily disabled while JER doesn't have a 26.1
+            // build pinned in gradle.properties; re-enable once jer_version
+            // points at a real artifact and `compat/jer` is removed from
+            // the source-set exclude list in build.gradle.
+            // if (net.neoforged.fml.ModList.get().isLoaded("jeresources")) {
+            //     com.stonytark.usefultoolsmod.compat.jer.UsefulToolsJerPlugin.register();
+            // }
+        });
     }
 
     // Add the example block item to the building blocks tab

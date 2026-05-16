@@ -1,13 +1,12 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
-import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
 
-public class EctoHoeItem extends HoeItem {
+public class EctoHoeItem extends Item {
 
-    public EctoHoeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EctoHoeItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

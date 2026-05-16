@@ -1,14 +1,16 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class CoalArmorItem extends ArmorItem {
+/**
+ * Coal-flavored armor. In 1.21.5+ ArmorItem was removed; the armor shape is now applied via
+ * {@code Item.Properties#humanoidArmor(material, ArmorType)} at registration time.
+ */
+public class CoalArmorItem extends Item {
 
-    public CoalArmorItem(Holder<ArmorMaterial> material, Type type, Properties properties) {
-        super(material, type, properties);
+    public CoalArmorItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

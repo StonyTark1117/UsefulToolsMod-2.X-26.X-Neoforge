@@ -1,5 +1,61 @@
 # Changelog
 
+## 2.2.3-26.1.2-neoforge
+
+Port from Minecraft 1.21.1 to 26.1.2 (NeoForge 21.1.219 → 26.1.0.1-beta). No new
+gameplay features — this release exists purely to make the 2.2.3 content available on
+26.1.
+
+### Build / toolchain
+- **Java 25** required (was 21). Use the foojay toolchain resolver, or set `JAVA_HOME`
+  to a Java 21 install for Gradle while the toolchain compiles the mod against 25.
+- **Gradle 9.1.0** (was 8.13), **NeoGradle 7.1.27** (was 7.0.+),
+  **foojay-resolver-convention 1.0.0** (the older 0.10.0 has a stale `IBM_SEMERU`
+  reference that breaks under Gradle 9).
+- Two run-types replace the old single `data`: `clientData` and `serverData`.
+
+### API migration
+- All custom tools/armor moved from the removed `SwordItem`/`PickaxeItem`/`ArmorItem`
+  subclasses to plain `Item` with `Item.Properties#sword(...)`/`#humanoidArmor(...)`.
+- `ModToolTiers` rebuilt as `ToolMaterial` records. `ModArmorMaterials` rebuilt as
+  `ArmorMaterial` records carrying `ResourceKey<EquipmentAsset>` keys.
+- 45 equipment-asset JSONs at `assets/usefultoolsmod/equipment/<material>.json`; armor
+  textures copied to the new `textures/entity/equipment/humanoid/{,_leggings/}` paths.
+- `GuiGraphics` → `GuiGraphicsExtractor`; `SpectralInfuserScreen` rewritten against the
+  1.21.6 extract-pass pipeline using `RenderPipelines.GUI_TEXTURED`.
+- `GhostRenderer` migrated to the 1.21.2 `RenderState` pattern (new `GhostRenderState`);
+  `GhostModel` animations baked once and applied per-frame via `KeyframeAnimation`.
+- `Block#use` → `Block#useWithoutItem` on `SpectralInfuserBlock`.
+- `BlockEntity` save data: `CompoundTag` → `ValueInput`/`ValueOutput`.
+- `Entity#hurt` is `final`; mobs override `hurtServer(ServerLevel, DamageSource, float)`.
+- Project-wide renames: `ResourceLocation` → `Identifier`, `MobSpawnType` →
+  `EntitySpawnReason`, `ArmorItem.Type` → `ArmorType`, `Util` → `util.Util`, advancements
+  `critereon` → `criterion`, `FMLEnvironment.dist` field → `getDist()` method, plus
+  several package moves (`Zombie`/`Drowned`/`AbstractSkeleton`/`Equippable`/`GameRules`/
+  `ThrowableItemProjectile` all moved to sub-packages).
+- `MobEffects` constants renamed (`DAMAGE_BOOST` → `STRENGTH`, `MOVEMENT_SPEED` → `SPEED`,
+  etc.); `GameRules.RULE_KEEPINVENTORY` → `KEEP_INVENTORY`.
+- `DeferredSpawnEggItem` retired in favor of vanilla `SpawnEggItem` + `Properties#spawnEgg`.
+
+### Known gaps
+- `compat/jer/**` is excluded from compile until JER publishes a 26.1 build on Modrinth.
+  Plugin source is checked in and ready.
+
+### Datagen
+- `datagen/**` has been rewritten against vanilla's 26.1 `ModelProvider` / `BlockModelGenerators`
+  / `ItemModelGenerators` system (NeoForge dropped its `client.model.generators` package in
+  26.1). Both `./gradlew runClientData` and `./gradlew runServerData` work — the old single
+  `data` run was replaced by these two so client and server outputs land in sibling
+  subdirs of `src/generated/resources/` and don't wipe each other's HashCache.
+- `ModBlockStateProvider` deliberately elides `SPECTRAL_INFUSER` from its known-blocks
+  stream because the block needs a directional + lit multivariant blockstate that the
+  vanilla cube helper can't express. Its blockstate and both `orientable_with_bottom`
+  models (`spectral_infuser` + `spectral_infuser_on`) live hand-written under
+  `src/main/resources/assets/usefultoolsmod/` so re-runs can't clobber them.
+
+See `MIGRATION_CHEATSHEET.md` (1073 lines) for the per-primer change catalog and
+`PORT_HANDOFF.md` for the in-progress notes.
+
 ## 2.2.3-1.21.1-neoforge
 
 ### Added

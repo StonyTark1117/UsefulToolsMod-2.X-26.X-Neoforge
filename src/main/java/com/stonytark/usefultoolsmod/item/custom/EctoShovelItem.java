@@ -1,13 +1,12 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.Tier;
 
-public class EctoShovelItem extends ShovelItem {
+public class EctoShovelItem extends Item {
 
-    public EctoShovelItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EctoShovelItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

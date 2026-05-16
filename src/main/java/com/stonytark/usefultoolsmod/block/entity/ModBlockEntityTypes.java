@@ -15,8 +15,8 @@ public class ModBlockEntityTypes {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SpectralInfuserBlockEntity>> SPECTRAL_INFUSER =
             BLOCK_ENTITY_TYPES.register("spectral_infuser",
-                    () -> BlockEntityType.Builder.of(SpectralInfuserBlockEntity::new,
-                            ModBlocks.SPECTRAL_INFUSER.get()).build(null));
+                    () -> new BlockEntityType<>(SpectralInfuserBlockEntity::new,
+                            java.util.Set.of(ModBlocks.SPECTRAL_INFUSER.get())));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITY_TYPES.register(eventBus);

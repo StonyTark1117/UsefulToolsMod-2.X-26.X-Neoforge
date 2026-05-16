@@ -1,15 +1,14 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 
-public class EdibleShovelItem extends ShovelItem {
+public class EdibleShovelItem extends Item {
 
-    public EdibleShovelItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EdibleShovelItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

@@ -4,7 +4,6 @@ package com.stonytark.usefultoolsmod.event;
 import net.neoforged.fml.common.EventBusSubscriber;
 import com.stonytark.usefultoolsmod.Config;
 import com.stonytark.usefultoolsmod.entity.custom.GhostEntity;
-import com.stonytark.usefultoolsmod.item.ModArmorMaterials;
 import com.stonytark.usefultoolsmod.item.ModItems;
 import com.stonytark.usefultoolsmod.item.custom.CoalArmorItem;
 import com.stonytark.usefultoolsmod.item.custom.CoalBurningHelper;
@@ -13,7 +12,6 @@ import com.stonytark.usefultoolsmod.item.custom.EctoplasmInfusionHelper;
 import com.stonytark.usefultoolsmod.trigger.ModTriggers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +20,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -33,22 +32,18 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Drowned;
+import net.minecraft.world.entity.monster.zombie.Drowned;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Guardian;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
 import net.minecraft.world.entity.monster.Phantom;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -62,13 +57,11 @@ import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 
 import java.util.*;
 
-@EventBusSubscriber
+@EventBusSubscriber(modid = com.stonytark.usefultoolsmod.UsefultoolsMod.MOD_ID)
 public class ModEvents {
 
     // -----------------------------------------------------------------------
@@ -105,7 +98,7 @@ public class ModEvents {
             spawnArmorAuraIfOp(player);
         }
 
-        if (!player.level().isClientSide) {
+        if (!player.level().isClientSide()) {
             if (Config.coalEnabled && Config.coalFireEffects) {
                 handleCoalToolBurning(player);
                 handleCoalArmorBurning(player);
@@ -250,7 +243,9 @@ public class ModEvents {
         if (player.level().isClientSide()) return;
 
         UUID uuid = player.getUUID();
-        boolean keepInventory = player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+        // 1.21.5+: getGameRules() lives on ServerLevel, not Level; .get(GameRule<T>) replaces .getBoolean.
+        boolean keepInventory = player.level() instanceof net.minecraft.server.level.ServerLevel sl
+                && sl.getGameRules().get(GameRules.KEEP_INVENTORY);
 
         // --- Burning armor ---
         if (COAL_ARMOR_BURNING.contains(uuid)) {
@@ -286,42 +281,40 @@ public class ModEvents {
         if (held.is(ModItems.OVERPOWER_SWORD.get())) {
             hasEffect = true;
             applyEffects(player,
-                    new MobEffectInstance(MobEffects.DAMAGE_BOOST,      10, 3, false, false, false),
-                    new MobEffectInstance(MobEffects.MOVEMENT_SPEED,    10, 3, false, false, false),
-                    new MobEffectInstance(MobEffects.JUMP,              10, 3, false, false, false),
-                    new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, 3, false, false, false));
+                    new MobEffectInstance(MobEffects.STRENGTH,      10, 3, false, false, false),
+                    new MobEffectInstance(MobEffects.SPEED,    10, 3, false, false, false),
+                    new MobEffectInstance(MobEffects.JUMP_BOOST,              10, 3, false, false, false),
+                    new MobEffectInstance(MobEffects.RESISTANCE, 10, 3, false, false, false));
         } else if (held.is(ModItems.OVERPOWER_PICKAXE.get())) {
             hasEffect = true;
             applyEffects(player,
-                    new MobEffectInstance(MobEffects.DIG_SPEED,    10, 3,  false, false, false),
-                    new MobEffectInstance(MobEffects.DAMAGE_BOOST, 10, 3,  false, false, false),
-                    new MobEffectInstance(MobEffects.JUMP,         10, 10, false, false, false));
+                    new MobEffectInstance(MobEffects.HASTE,    10, 3,  false, false, false),
+                    new MobEffectInstance(MobEffects.STRENGTH, 10, 3,  false, false, false),
+                    new MobEffectInstance(MobEffects.JUMP_BOOST,         10, 10, false, false, false));
         } else if (held.is(ModItems.OVERPOWER_SHOVEL.get())) {
             hasEffect = true;
             applyEffects(player,
-                    new MobEffectInstance(MobEffects.DIG_SPEED,    10, 3, false, false, false),
-                    new MobEffectInstance(MobEffects.DAMAGE_BOOST, 10, 1, false, false, false),
-                    new MobEffectInstance(MobEffects.JUMP,         10, 5, false, false, false));
+                    new MobEffectInstance(MobEffects.HASTE,    10, 3, false, false, false),
+                    new MobEffectInstance(MobEffects.STRENGTH, 10, 1, false, false, false),
+                    new MobEffectInstance(MobEffects.JUMP_BOOST,         10, 5, false, false, false));
         } else if (held.is(ModItems.OVERPOWER_AXE.get())) {
             hasEffect = true;
             applyEffects(player,
                     new MobEffectInstance(MobEffects.REGENERATION, 10, 3,  false, false, false),
-                    new MobEffectInstance(MobEffects.DAMAGE_BOOST, 10, 3,  false, false, false),
-                    new MobEffectInstance(MobEffects.JUMP,         10, 10, false, false, false));
+                    new MobEffectInstance(MobEffects.STRENGTH, 10, 3,  false, false, false),
+                    new MobEffectInstance(MobEffects.JUMP_BOOST,         10, 10, false, false, false));
         }
 
-        if (hasEffect && player.level().isClientSide) {
+        if (hasEffect && player.level().isClientSide()) {
             spawnAuraParticles(player.level(), player);
         }
     }
 
     private static void spawnArmorAuraIfOp(Player player) {
-        for (ItemStack armorStack : player.getArmorSlots()) {
-            if (armorStack.getItem() instanceof ArmorItem armor) {
-                if (ModArmorMaterials.OVERPOWER_ARMOR_MATERIAL.is(armor.getMaterial())
-                        && player.level().isClientSide) {
-                    spawnAuraParticles(player.level(), player);
-                }
+        if (!player.level().isClientSide()) return;
+        for (EquipmentSlot slot : ARMOR_SLOTS) {
+            if (isOpArmor(player.getItemBySlot(slot))) {
+                spawnAuraParticles(player.level(), player);
             }
         }
     }
@@ -575,7 +568,7 @@ public class ModEvents {
                     piece.hurtAndBreak(1, player, slot);
                     melted = true;
                     // On break: 10% chance to place a water source at the player's feet
-                    if (piece.isEmpty() && serverLevel.random.nextFloat() < 0.1f) {
+                    if (piece.isEmpty() && serverLevel.getRandom().nextFloat() < 0.1f) {
                         var feet = player.blockPosition();
                         if (serverLevel.getBlockState(feet).isAir()) {
                             serverLevel.setBlock(feet, Blocks.WATER.defaultBlockState(), 3);
@@ -639,7 +632,7 @@ public class ModEvents {
 
         // Pprism tool in hand → Haste I (cancels underwater mining penalty)
         if (isPprismTool(player.getMainHandItem()) || isPprismTool(player.getOffhandItem())) {
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60, 0, false, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 60, 0, false, false, false));
         }
 
         // Per-slot armor benefits while in water
@@ -649,11 +642,11 @@ public class ModEvents {
         }
         // Chestplate → Resistance I (ocean's protective pressure)
         if (isPprismArmor(player.getItemBySlot(EquipmentSlot.CHEST))) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, false));
         }
         // Leggings → Haste I (removes underwater mining penalty)
         if (isPprismArmor(player.getItemBySlot(EquipmentSlot.LEGS))) {
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60, 0, false, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 60, 0, false, false, false));
         }
         // Boots → Slow Falling (buoyancy — rise through water effortlessly)
         if (isPprismArmor(player.getItemBySlot(EquipmentSlot.FEET))) {
@@ -693,8 +686,15 @@ public class ModEvents {
     }
 
     private static boolean isIceArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        return ModArmorMaterials.ICE_ARMOR_MATERIAL.is(armor.getMaterial());
+        return matchesArmorSet(stack, ModItems.ICE_HELMET.get(), ModItems.ICE_CHESTPLATE.get(),
+                ModItems.ICE_LEGGINGS.get(), ModItems.ICE_BOOTS.get());
+    }
+
+    /** Returns true when the stack is one of the four armor pieces of a named set. */
+    private static boolean matchesArmorSet(ItemStack stack, Item helmet, Item chestplate, Item leggings, Item boots) {
+        if (stack.isEmpty()) return false;
+        Item item = stack.getItem();
+        return item == helmet || item == chestplate || item == leggings || item == boots;
     }
 
     private static boolean isPprismTool(ItemStack stack) {
@@ -707,8 +707,8 @@ public class ModEvents {
     }
 
     private static boolean isPprismArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        return ModArmorMaterials.PPRISM_ARMOR_MATERIAL.is(armor.getMaterial());
+        return matchesArmorSet(stack, ModItems.PPRISM_HELMET.get(), ModItems.PPRISM_CHESTPLATE.get(),
+                ModItems.PPRISM_LEGGINGS.get(), ModItems.PPRISM_BOOTS.get());
     }
 
     private static boolean isCoalTool(ItemStack stack) {
@@ -733,18 +733,18 @@ public class ModEvents {
     }
 
     private static boolean isOpArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        return ModArmorMaterials.OVERPOWER_ARMOR_MATERIAL.is(armor.getMaterial());
+        return matchesArmorSet(stack, ModItems.OVERPOWER_HELMET.get(), ModItems.OVERPOWER_CHESTPLATE.get(),
+                ModItems.OVERPOWER_LEGGINGS.get(), ModItems.OVERPOWER_BOOTS.get());
     }
 
     private static boolean isFniArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        return ModArmorMaterials.FNI_ARMOR_MATERIAL.is(armor.getMaterial());
+        return matchesArmorSet(stack, ModItems.FNI_HELMET.get(), ModItems.FNI_CHESTPLATE.get(),
+                ModItems.FNI_LEGGINGS.get(), ModItems.FNI_BOOTS.get());
     }
 
     private static boolean isEctoArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        return ModArmorMaterials.ECTO_ARMOR_MATERIAL.is(armor.getMaterial());
+        return matchesArmorSet(stack, ModItems.ECTO_HELMET.get(), ModItems.ECTO_CHESTPLATE.get(),
+                ModItems.ECTO_LEGGINGS.get(), ModItems.ECTO_BOOTS.get());
     }
 
     private static boolean isWearingAnyCoalArmor(Player player) {
@@ -810,7 +810,7 @@ public class ModEvents {
         if (target.isAir() || target.canBeReplaced()) {
             level.setBlock(firePos, BaseFireBlock.getState(level, firePos), 11);
             level.playSound(null, firePos, SoundEvents.FLINTANDSTEEL_USE,
-                    SoundSource.BLOCKS, 1.0f, level.random.nextFloat() * 0.4f + 0.8f);
+                    SoundSource.BLOCKS, 1.0f, level.getRandom().nextFloat() * 0.4f + 0.8f);
             held.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
             event.setCanceled(true);
         }
@@ -830,9 +830,9 @@ public class ModEvents {
         BlockState floorState = level.getBlockState(feetPos.below());
 
         if (((FireBlock) Blocks.FIRE).getBurnOdds(floorState) > 0
-                && level.random.nextFloat() < 0.04f) {
+                && level.getRandom().nextFloat() < 0.04f) {
             Direction[] dirs = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
-            Direction randDir = dirs[level.random.nextInt(4)];
+            Direction randDir = dirs[level.getRandom().nextInt(4)];
             BlockPos firePos = feetPos.relative(randDir);
             if (level.getBlockState(firePos).isAir()) {
                 level.setBlock(firePos, BaseFireBlock.getState(level, firePos), 11);
@@ -870,13 +870,13 @@ public class ModEvents {
     }
 
     private static void spawnAuraParticles(net.minecraft.world.level.Level level, Player player) {
-        double radius = 0.5 + level.random.nextDouble() * 0.5;
-        double angle  = level.random.nextDouble() * Math.PI * 2;
+        double radius = 0.5 + level.getRandom().nextDouble() * 0.5;
+        double angle  = level.getRandom().nextDouble() * Math.PI * 2;
         double x = player.getX() + Math.cos(angle) * radius;
-        double y = player.getY() + 1.0 + (level.random.nextDouble() - 0.5) * 0.3;
+        double y = player.getY() + 1.0 + (level.getRandom().nextDouble() - 0.5) * 0.3;
         double z = player.getZ() + Math.sin(angle) * radius;
 
-        if (level.random.nextBoolean()) {
+        if (level.getRandom().nextBoolean()) {
             level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, x, y, z, 0, 0.02, 0);
         } else {
             level.addParticle(ParticleTypes.ENCHANT, x, y, z, 0, 0.01, 0);
@@ -896,20 +896,20 @@ public class ModEvents {
         if (EctoplasmInfusionHelper.isInfused(stack)) {
             tips.add(Component.translatable("tooltip.usefultoolsmod.ectoplasm_infused")
                     .withStyle(ChatFormatting.DARK_AQUA));
-            if (stack.getItem() instanceof ArmorItem) {
+            if (isAnyArmorPiece(stack)) {
                 tips.add(Component.translatable("tooltip.usefultoolsmod.ecto_armor_invisibility")
                         .withStyle(ChatFormatting.GRAY));
             } else {
                 tips.add(Component.translatable("tooltip.usefultoolsmod.ecto_can_damage_ghosts")
                         .withStyle(ChatFormatting.GRAY));
             }
-            if (stack.getItem() instanceof PickaxeItem) {
+            if (isPickaxe(stack)) {
                 tips.add(Component.translatable("tooltip.usefultoolsmod.spectral_sight")
                         .withStyle(ChatFormatting.GRAY));
-            } else if (stack.getItem() instanceof ShovelItem) {
+            } else if (isShovel(stack)) {
                 tips.add(Component.translatable("tooltip.usefultoolsmod.spectral_efficiency")
                         .withStyle(ChatFormatting.GRAY));
-            } else if (stack.getItem() instanceof HoeItem) {
+            } else if (isHoe(stack)) {
                 tips.add(Component.translatable("tooltip.usefultoolsmod.spectral_fortune")
                         .withStyle(ChatFormatting.GRAY));
             }
@@ -1005,11 +1005,9 @@ public class ModEvents {
         if (isFniArmor(stack)) {
             tips.add(Component.translatable("tooltip.usefultoolsmod.fni_header")
                     .withStyle(ChatFormatting.GOLD));
-            if (stack.getItem() instanceof ArmorItem a) {
-                if (a.getType() == ArmorItem.Type.BOOTS) {
-                    tips.add(Component.translatable("tooltip.usefultoolsmod.fni_boots")
-                            .withStyle(ChatFormatting.GRAY));
-                }
+            if (stack.is(ModItems.FNI_BOOTS.get())) {
+                tips.add(Component.translatable("tooltip.usefultoolsmod.fni_boots")
+                        .withStyle(ChatFormatting.GRAY));
             }
             tips.add(Component.translatable("tooltip.usefultoolsmod.fni_full_set")
                     .withStyle(ChatFormatting.DARK_GREEN));
@@ -1394,18 +1392,18 @@ public class ModEvents {
     }
 
     private static void addArmorSlotTooltip(List<Component> tips, ItemStack stack, String prefix) {
-        if (!(stack.getItem() instanceof ArmorItem armor)) return;
-        String slot = switch (armor.getType()) {
-            case BOOTS -> "boots";
-            case LEGGINGS -> "leggings";
-            case CHESTPLATE -> "chestplate";
-            case HELMET -> "helmet";
-            default -> null;
-        };
-        if (slot != null) {
-            tips.add(Component.translatable("tooltip.usefultoolsmod." + prefix + "_" + slot)
-                    .withStyle(ChatFormatting.GRAY));
-        }
+        if (stack.isEmpty()) return;
+        var rl = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+        if (rl == null) return;
+        String path = rl.getPath();
+        String slot;
+        if (path.endsWith("_boots")) slot = "boots";
+        else if (path.endsWith("_leggings")) slot = "leggings";
+        else if (path.endsWith("_chestplate")) slot = "chestplate";
+        else if (path.endsWith("_helmet")) slot = "helmet";
+        else return;
+        tips.add(Component.translatable("tooltip.usefultoolsmod." + prefix + "_" + slot)
+                .withStyle(ChatFormatting.GRAY));
     }
 
     private static void addFoodToolTooltip(List<Component> tips, ItemStack stack) {
@@ -1523,7 +1521,7 @@ public class ModEvents {
         player.teleportTo(tx, ty, tz);
 
         // Effects
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 0, false, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 0, false, false, true));
 
         if (level instanceof ServerLevel serverLevel) {
             // Particles at entry
@@ -1559,28 +1557,6 @@ public class ModEvents {
     // Generalized food hunger drain (all food sets including cake)
     // -----------------------------------------------------------------------
 
-    /** All food armor materials for hunger drain scanning (lazy to avoid premature registry access). */
-    private static List<Holder<ArmorMaterial>> FOOD_ARMOR_MATERIALS;
-    private static List<Holder<ArmorMaterial>> getFoodArmorMaterials() {
-        if (FOOD_ARMOR_MATERIALS == null) {
-            FOOD_ARMOR_MATERIALS = List.of(
-                    ModArmorMaterials.CAKE_ARMOR_MATERIAL,
-                    ModArmorMaterials.BREAD_ARMOR_MATERIAL,
-                    ModArmorMaterials.DRIED_KELP_ARMOR_MATERIAL,
-                    ModArmorMaterials.ROTTEN_FLESH_ARMOR_MATERIAL,
-                    ModArmorMaterials.MELON_ARMOR_MATERIAL,
-                    ModArmorMaterials.SWEET_BERRY_ARMOR_MATERIAL,
-                    ModArmorMaterials.PUMPKIN_PIE_ARMOR_MATERIAL,
-                    ModArmorMaterials.MUSHROOM_ARMOR_MATERIAL,
-                    ModArmorMaterials.PUFFERFISH_ARMOR_MATERIAL,
-                    ModArmorMaterials.HONEY_ARMOR_MATERIAL,
-                    ModArmorMaterials.CHORUS_FRUIT_ARMOR_MATERIAL,
-                    ModArmorMaterials.GOLDEN_APPLE_ARMOR_MATERIAL
-            );
-        }
-        return FOOD_ARMOR_MATERIALS;
-    }
-
     private static boolean isFoodTool(ItemStack stack) {
         if (stack.isEmpty()) return false;
         return isCakeTool(stack) || isBreadTool(stack) || isDriedKelpTool(stack)
@@ -1590,11 +1566,11 @@ public class ModEvents {
     }
 
     private static boolean isFoodArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        for (Holder<ArmorMaterial> mat : getFoodArmorMaterials()) {
-            if (mat.is(armor.getMaterial())) return true;
-        }
-        return false;
+        if (stack.isEmpty()) return false;
+        return isCakeArmor(stack) || isBreadArmor(stack) || isDriedKelpArmor(stack)
+            || isRottenFleshArmor(stack) || isMelonArmor(stack) || isSweetBerryArmor(stack)
+            || isPumpkinPieArmor(stack) || isMushroomArmor(stack) || isPufferfishArmor(stack)
+            || isHoneyArmor(stack) || isChorusFruitArmor(stack) || isGoldenAppleArmor(stack);
     }
 
     private static boolean isFoodSetEnabled(ItemStack stack) {
@@ -1650,11 +1626,11 @@ public class ModEvents {
     private static void handleCakeArmorEffects(Player player) {
         // Boots → Speed I (sugar rush)
         if (isCakeArmor(player.getItemBySlot(EquipmentSlot.FEET))) {
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         }
         // Leggings → Jump Boost I (light and fluffy)
         if (isCakeArmor(player.getItemBySlot(EquipmentSlot.LEGS))) {
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         }
         // Chestplate → Regeneration I (comfort food healing)
         if (isCakeArmor(player.getItemBySlot(EquipmentSlot.CHEST))) {
@@ -1685,8 +1661,8 @@ public class ModEvents {
     }
 
     private static boolean isCakeArmor(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor)) return false;
-        return ModArmorMaterials.CAKE_ARMOR_MATERIAL.is(armor.getMaterial());
+        return matchesArmorSet(stack, ModItems.CAKE_HELMET.get(), ModItems.CAKE_CHESTPLATE.get(),
+                ModItems.CAKE_LEGGINGS.get(), ModItems.CAKE_BOOTS.get());
     }
 
     // -----------------------------------------------------------------------
@@ -1705,17 +1681,54 @@ public class ModEvents {
         if (stack.isEmpty() || !EctoplasmInfusionHelper.isInfused(stack)) return;
 
         // Pickaxe → Night Vision (spectral sight)
-        if (stack.getItem() instanceof PickaxeItem) {
+        if (isPickaxe(stack)) {
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
         }
         // Shovel → Haste I (spectral efficiency)
-        else if (stack.getItem() instanceof ShovelItem) {
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60, 0, false, false, true));
+        else if (isShovel(stack)) {
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 60, 0, false, false, true));
         }
         // Hoe → Luck I (spectral fortune)
-        else if (stack.getItem() instanceof HoeItem) {
+        else if (isHoe(stack)) {
             player.addEffect(new MobEffectInstance(MobEffects.LUCK, 60, 0, false, false, true));
         }
+    }
+
+    // -----------------------------------------------------------------------
+    // Tool/armor type detection.
+    // Primary signal: vanilla ItemTags (covers vanilla + tagged-correctly mods).
+    // Fallback: registry-path suffix for our own items, which extend plain Item
+    // (not vanilla *Item subclasses) and aren't auto-tagged by vanilla.
+    // -----------------------------------------------------------------------
+
+    private static boolean isPickaxe(ItemStack stack) {
+        return !stack.isEmpty() && (stack.is(ItemTags.PICKAXES) || endsWithSuffix(stack, "_pickaxe"));
+    }
+
+    private static boolean isShovel(ItemStack stack) {
+        return !stack.isEmpty() && (stack.is(ItemTags.SHOVELS) || endsWithSuffix(stack, "_shovel"));
+    }
+
+    private static boolean isHoe(ItemStack stack) {
+        return !stack.isEmpty() && (stack.is(ItemTags.HOES) || endsWithSuffix(stack, "_hoe"));
+    }
+
+    private static boolean isAnyArmorPiece(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (stack.is(ItemTags.HEAD_ARMOR) || stack.is(ItemTags.CHEST_ARMOR)
+                || stack.is(ItemTags.LEG_ARMOR) || stack.is(ItemTags.FOOT_ARMOR)) {
+            return true;
+        }
+        var rl = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+        if (rl == null) return false;
+        String path = rl.getPath();
+        return path.endsWith("_helmet") || path.endsWith("_chestplate")
+            || path.endsWith("_leggings") || path.endsWith("_boots");
+    }
+
+    private static boolean endsWithSuffix(ItemStack stack, String suffix) {
+        var rl = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return rl != null && rl.getPath().endsWith(suffix);
     }
 
     /**
@@ -1748,77 +1761,88 @@ public class ModEvents {
             || s.is(ModItems.BREAD_SHOVEL.get()) || s.is(ModItems.BREAD_AXE.get()) || s.is(ModItems.BREAD_HOE.get()));
     }
     private static boolean isBreadArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.BREAD_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.BREAD_HELMET.get(), ModItems.BREAD_CHESTPLATE.get(),
+                ModItems.BREAD_LEGGINGS.get(), ModItems.BREAD_BOOTS.get());
     }
     private static boolean isDriedKelpTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.DRIED_KELP_SWORD.get()) || s.is(ModItems.DRIED_KELP_PICKAXE.get())
             || s.is(ModItems.DRIED_KELP_SHOVEL.get()) || s.is(ModItems.DRIED_KELP_AXE.get()) || s.is(ModItems.DRIED_KELP_HOE.get()));
     }
     private static boolean isDriedKelpArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.DRIED_KELP_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.DRIED_KELP_HELMET.get(), ModItems.DRIED_KELP_CHESTPLATE.get(),
+                ModItems.DRIED_KELP_LEGGINGS.get(), ModItems.DRIED_KELP_BOOTS.get());
     }
     private static boolean isRottenFleshTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.ROTTEN_FLESH_SWORD.get()) || s.is(ModItems.ROTTEN_FLESH_PICKAXE.get())
             || s.is(ModItems.ROTTEN_FLESH_SHOVEL.get()) || s.is(ModItems.ROTTEN_FLESH_AXE.get()) || s.is(ModItems.ROTTEN_FLESH_HOE.get()));
     }
     private static boolean isRottenFleshArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.ROTTEN_FLESH_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.ROTTEN_FLESH_HELMET.get(), ModItems.ROTTEN_FLESH_CHESTPLATE.get(),
+                ModItems.ROTTEN_FLESH_LEGGINGS.get(), ModItems.ROTTEN_FLESH_BOOTS.get());
     }
     private static boolean isMelonTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.MELON_SWORD.get()) || s.is(ModItems.MELON_PICKAXE.get())
             || s.is(ModItems.MELON_SHOVEL.get()) || s.is(ModItems.MELON_AXE.get()) || s.is(ModItems.MELON_HOE.get()));
     }
     private static boolean isMelonArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.MELON_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.MELON_HELMET.get(), ModItems.MELON_CHESTPLATE.get(),
+                ModItems.MELON_LEGGINGS.get(), ModItems.MELON_BOOTS.get());
     }
     private static boolean isSweetBerryTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.SWEET_BERRY_SWORD.get()) || s.is(ModItems.SWEET_BERRY_PICKAXE.get())
             || s.is(ModItems.SWEET_BERRY_SHOVEL.get()) || s.is(ModItems.SWEET_BERRY_AXE.get()) || s.is(ModItems.SWEET_BERRY_HOE.get()));
     }
     private static boolean isSweetBerryArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.SWEET_BERRY_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.SWEET_BERRY_HELMET.get(), ModItems.SWEET_BERRY_CHESTPLATE.get(),
+                ModItems.SWEET_BERRY_LEGGINGS.get(), ModItems.SWEET_BERRY_BOOTS.get());
     }
     private static boolean isPumpkinPieTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.PUMPKIN_PIE_SWORD.get()) || s.is(ModItems.PUMPKIN_PIE_PICKAXE.get())
             || s.is(ModItems.PUMPKIN_PIE_SHOVEL.get()) || s.is(ModItems.PUMPKIN_PIE_AXE.get()) || s.is(ModItems.PUMPKIN_PIE_HOE.get()));
     }
     private static boolean isPumpkinPieArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.PUMPKIN_PIE_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.PUMPKIN_PIE_HELMET.get(), ModItems.PUMPKIN_PIE_CHESTPLATE.get(),
+                ModItems.PUMPKIN_PIE_LEGGINGS.get(), ModItems.PUMPKIN_PIE_BOOTS.get());
     }
     private static boolean isMushroomTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.MUSHROOM_SWORD.get()) || s.is(ModItems.MUSHROOM_PICKAXE.get())
             || s.is(ModItems.MUSHROOM_SHOVEL.get()) || s.is(ModItems.MUSHROOM_AXE.get()) || s.is(ModItems.MUSHROOM_HOE.get()));
     }
     private static boolean isMushroomArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.MUSHROOM_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.MUSHROOM_HELMET.get(), ModItems.MUSHROOM_CHESTPLATE.get(),
+                ModItems.MUSHROOM_LEGGINGS.get(), ModItems.MUSHROOM_BOOTS.get());
     }
     private static boolean isPufferfishTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.PUFFERFISH_SWORD.get()) || s.is(ModItems.PUFFERFISH_PICKAXE.get())
             || s.is(ModItems.PUFFERFISH_SHOVEL.get()) || s.is(ModItems.PUFFERFISH_AXE.get()) || s.is(ModItems.PUFFERFISH_HOE.get()));
     }
     private static boolean isPufferfishArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.PUFFERFISH_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.PUFFERFISH_HELMET.get(), ModItems.PUFFERFISH_CHESTPLATE.get(),
+                ModItems.PUFFERFISH_LEGGINGS.get(), ModItems.PUFFERFISH_BOOTS.get());
     }
     private static boolean isHoneyTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.HONEY_SWORD.get()) || s.is(ModItems.HONEY_PICKAXE.get())
             || s.is(ModItems.HONEY_SHOVEL.get()) || s.is(ModItems.HONEY_AXE.get()) || s.is(ModItems.HONEY_HOE.get()));
     }
     private static boolean isHoneyArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.HONEY_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.HONEY_HELMET.get(), ModItems.HONEY_CHESTPLATE.get(),
+                ModItems.HONEY_LEGGINGS.get(), ModItems.HONEY_BOOTS.get());
     }
     private static boolean isChorusFruitTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.CHORUS_FRUIT_SWORD.get()) || s.is(ModItems.CHORUS_FRUIT_PICKAXE.get())
             || s.is(ModItems.CHORUS_FRUIT_SHOVEL.get()) || s.is(ModItems.CHORUS_FRUIT_AXE.get()) || s.is(ModItems.CHORUS_FRUIT_HOE.get()));
     }
     private static boolean isChorusFruitArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.CHORUS_FRUIT_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.CHORUS_FRUIT_HELMET.get(), ModItems.CHORUS_FRUIT_CHESTPLATE.get(),
+                ModItems.CHORUS_FRUIT_LEGGINGS.get(), ModItems.CHORUS_FRUIT_BOOTS.get());
     }
     private static boolean isGoldenAppleTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.GOLDEN_APPLE_SWORD.get()) || s.is(ModItems.GOLDEN_APPLE_PICKAXE.get())
             || s.is(ModItems.GOLDEN_APPLE_SHOVEL.get()) || s.is(ModItems.GOLDEN_APPLE_AXE.get()) || s.is(ModItems.GOLDEN_APPLE_HOE.get()));
     }
     private static boolean isGoldenAppleArmor(ItemStack s) {
-        return !s.isEmpty() && s.getItem() instanceof ArmorItem a && ModArmorMaterials.GOLDEN_APPLE_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.GOLDEN_APPLE_HELMET.get(), ModItems.GOLDEN_APPLE_CHESTPLATE.get(),
+                ModItems.GOLDEN_APPLE_LEGGINGS.get(), ModItems.GOLDEN_APPLE_BOOTS.get());
     }
 
     private static boolean isWearingFullSet(Player player, java.util.function.Predicate<ItemStack> check) {
@@ -1835,9 +1859,9 @@ public class ModEvents {
     // --- Bread: Boots=Speed, Legs=Jump, Chest=Saturation, Helm=Luck, Full=Hunger immunity ---
     private static void handleBreadArmorEffects(Player player) {
         if (isBreadArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isBreadArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isBreadArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 60, 0, false, false, true));
         if (isBreadArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
@@ -1852,7 +1876,7 @@ public class ModEvents {
         if (isDriedKelpArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 60, 0, false, false, true));
         if (isDriedKelpArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 60, 0, false, false, true));
         if (isDriedKelpArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 60, 0, false, false, true));
         if (isDriedKelpArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
@@ -1868,7 +1892,7 @@ public class ModEvents {
         if (isRottenFleshArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false, true));
         if (isRottenFleshArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isRottenFleshArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 60, 0, false, false, true));
     }
@@ -1876,9 +1900,9 @@ public class ModEvents {
     // --- Melon: Boots=Speed, Legs=Jump, Chest=Regen, Helm=Water Breathing, Full=Passive hunger restore ---
     private static void handleMelonArmorEffects(Player player) {
         if (isMelonArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isMelonArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isMelonArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, false, false, true));
         if (isMelonArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
@@ -1891,9 +1915,9 @@ public class ModEvents {
     // --- Sweet Berries: Boots=Speed, Legs=Jump Boost, Chest=Regen, Helm=Saturation, Full=Thorns (event) ---
     private static void handleSweetBerryArmorEffects(Player player) {
         if (isSweetBerryArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isSweetBerryArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isSweetBerryArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, false, false, true));
         if (isSweetBerryArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
@@ -1903,9 +1927,9 @@ public class ModEvents {
     // --- Pumpkin Pie: Boots=Speed, Legs=Jump, Chest=Absorption, Helm=Enderman avoid (event), Full=Luck ---
     private static void handlePumpkinPieArmorEffects(Player player) {
         if (isPumpkinPieArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isPumpkinPieArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isPumpkinPieArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isPumpkinPieArmor))
@@ -1915,18 +1939,18 @@ public class ModEvents {
     // --- Mushroom: Boots=Haste, Legs=Jump, Chest=Resistance, Helm=Night Vision, Full=Nausea aura ---
     private static void handleMushroomArmorEffects(Player player) {
         if (isMushroomArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 60, 0, false, false, true));
         if (isMushroomArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isMushroomArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isMushroomArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
         if (Config.mushroomSporeCloud && isWearingFullSet(player, ModEvents::isMushroomArmor)
                 && player.tickCount % 40 == 0 && player.level() instanceof ServerLevel serverLevel) {
             AABB area = player.getBoundingBox().inflate(4.0);
             for (Mob mob : serverLevel.getEntitiesOfClass(Mob.class, area, m -> m.getTarget() != null)) {
-                mob.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0, false, false, false));
+                mob.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 100, 0, false, false, false));
             }
         }
     }
@@ -1936,7 +1960,7 @@ public class ModEvents {
         if (isPufferfishArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 60, 0, false, false, true));
         if (isPufferfishArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isPufferfishArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.removeEffect(MobEffects.POISON);
         if (isPufferfishArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
@@ -1955,7 +1979,7 @@ public class ModEvents {
         if (isHoneyArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
         if (isHoneyArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isHoneyArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false, true));
         if (isHoneyArmor(player.getItemBySlot(EquipmentSlot.HEAD))) {
@@ -1968,9 +1992,9 @@ public class ModEvents {
         if (isChorusFruitArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
         if (isChorusFruitArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isChorusFruitArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isChorusFruitArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 260, 0, false, false, true));
     }
@@ -1978,9 +2002,9 @@ public class ModEvents {
     // --- Golden Apple: Boots=Speed, Legs=Resistance, Chest=Regen, Helm=Fire Resist, Full=Absorption II ---
     private static void handleGoldenAppleArmorEffects(Player player) {
         if (isGoldenAppleArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isGoldenAppleArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isGoldenAppleArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, false, false, true));
         if (isGoldenAppleArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
@@ -2001,7 +2025,7 @@ public class ModEvents {
         if (source.getEntity() instanceof Player attacker) {
             ItemStack held = attacker.getMainHandItem();
             if (Config.honeyEnabled && isHoneyTool(held)) {
-                event.getEntity().addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0));
+                event.getEntity().addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 0));
             }
             if (Config.pufferfishEnabled && isPufferfishTool(held)) {
                 event.getEntity().addEffect(new MobEffectInstance(MobEffects.POISON, 100, 0));
@@ -2013,18 +2037,18 @@ public class ModEvents {
                 event.getEntity().addEffect(new MobEffectInstance(MobEffects.HUNGER, 100, 0));
             }
             if (Config.mushroomEnabled && isMushroomTool(held)) {
-                event.getEntity().addEffect(new MobEffectInstance(MobEffects.CONFUSION, 60, 0));
+                event.getEntity().addEffect(new MobEffectInstance(MobEffects.NAUSEA, 60, 0));
             }
             if (Config.chorusFruitEnabled && Config.chorusFruitTeleport && isChorusFruitTool(held)) {
-                if (attacker.level().random.nextFloat() < 0.1f) {
+                if (attacker.level().getRandom().nextFloat() < 0.1f) {
                     teleportRandomly(event.getEntity(), 3, 8);
                 }
             }
             // Vanilla material tool on-hit effects
             if (Config.paperEnabled && Config.paperEffects && isPaperTool(held)) {
-                if (attacker.level().random.nextFloat() < 0.05f)
+                if (attacker.level().getRandom().nextFloat() < 0.05f)
                     event.getEntity().addEffect(new MobEffectInstance(MobEffects.WITHER, 20, 0));
-                if (attacker.level().random.nextFloat() < 0.25f)
+                if (attacker.level().getRandom().nextFloat() < 0.25f)
                     held.hurtAndBreak(held.getMaxDamage() - held.getDamageValue(), attacker, EquipmentSlot.MAINHAND);
             }
             if (Config.featherEnabled && Config.featherEffects && isFeatherTool(held)) {
@@ -2067,7 +2091,7 @@ public class ModEvents {
             }
             if (Config.magmaCreamEnabled && Config.magmaCreamEffects && isMagmaCreamTool(held)) {
                 event.getEntity().setRemainingFireTicks(100);
-                event.getEntity().addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0));
+                event.getEntity().addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 0));
             }
             if (Config.slimeEnabled && Config.slimeEffects && isSlimeTool(held)) {
                 LivingEntity target = event.getEntity();
@@ -2079,14 +2103,14 @@ public class ModEvents {
                 event.getEntity().setRemainingFireTicks(120);
             }
             if (Config.purpurEnabled && Config.purpurEffects && isPurpurTool(held)) {
-                if (attacker.level().random.nextFloat() < 0.1f)
+                if (attacker.level().getRandom().nextFloat() < 0.1f)
                     teleportRandomly(event.getEntity(), 5, 10);
             }
             if (Config.ghastTearEnabled && Config.ghastTearEffects && isGhastTearTool(held)) {
                 attacker.heal(2.0f);
             }
             if (Config.eyeOfEnderEnabled && Config.eyeOfEnderEffects && isEyeOfEnderTool(held)) {
-                if (attacker.level().random.nextFloat() < 0.15f)
+                if (attacker.level().getRandom().nextFloat() < 0.15f)
                     event.getEntity().addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 0));
             }
             if (Config.shulkerEnabled && Config.shulkerEffects && isShulkerTool(held)) {
@@ -2100,18 +2124,18 @@ public class ModEvents {
             if (Config.dragonBreathEnabled && Config.dragonBreathEffects && isDragonBreathTool(held)) {
                 event.getEntity().addEffect(new MobEffectInstance(MobEffects.WITHER, 60, 1));
                 event.getEntity().addEffect(new MobEffectInstance(MobEffects.POISON, 60, 0));
-                if (attacker.level() instanceof ServerLevel sl && attacker.level().random.nextFloat() < 0.3f) {
+                if (attacker.level() instanceof ServerLevel sl && attacker.level().getRandom().nextFloat() < 0.3f) {
                     AreaEffectCloud cloud = new AreaEffectCloud(sl, event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
                     cloud.setRadius(1.5f);
                     cloud.setDuration(40);
                     cloud.setRadiusPerTick(-1.5f / 40f);
-                    cloud.addEffect(new MobEffectInstance(MobEffects.HARM, 1, 0));
+                    cloud.addEffect(new MobEffectInstance(MobEffects.INSTANT_DAMAGE, 1, 0));
                     cloud.setOwner(attacker);
                     sl.addFreshEntity(cloud);
                 }
             }
             if (Config.phantomEnabled && Config.phantomEffects && isPhantomTool(held)) {
-                if (!attacker.level().isDay()) event.setAmount(event.getAmount() + 2.0f);
+                if (!attacker.level().isBrightOutside()) event.setAmount(event.getAmount() + 2.0f);
             }
             if (Config.nautilusEnabled && Config.nautilusEffects && isNautilusTool(held)) {
                 // Nautilus tool on-hit: nothing special, passive effects only
@@ -2128,12 +2152,12 @@ public class ModEvents {
             // Honey sticky — attacker gets Slowness II
             if (Config.honeyEnabled && Config.honeySticky
                     && isWearingFullSet(victim, ModEvents::isHoneyArmor)) {
-                attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
+                attacker.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 1));
             }
             // Chorus Fruit teleport dodge — 15% chance
             if (Config.chorusFruitEnabled && Config.chorusFruitTeleport
                     && isWearingFullSet(victim, ModEvents::isChorusFruitArmor)) {
-                if (victim.level().random.nextFloat() < 0.15f) {
+                if (victim.level().getRandom().nextFloat() < 0.15f) {
                     teleportRandomly(victim, 3, 8);
                     event.setCanceled(true);
                 }
@@ -2153,7 +2177,7 @@ public class ModEvents {
             if (Config.magmaCreamEnabled && Config.magmaCreamEffects
                     && isWearingFullSet(victim, ModEvents::isMagmaCreamArmor)) {
                 attacker.setRemainingFireTicks(60);
-                attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0));
+                attacker.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 0));
             }
             if (Config.slimeEnabled && Config.slimeEffects
                     && isWearingFullSet(victim, ModEvents::isSlimeArmor)) {
@@ -2167,7 +2191,7 @@ public class ModEvents {
             }
             if (Config.purpurEnabled && Config.purpurEffects
                     && isWearingFullSet(victim, ModEvents::isPurpurArmor)) {
-                if (victim.level().random.nextFloat() < 0.20f) {
+                if (victim.level().getRandom().nextFloat() < 0.20f) {
                     teleportRandomly(victim, 3, 8);
                     event.setCanceled(true);
                 }
@@ -2284,8 +2308,8 @@ public class ModEvents {
         if (level.isClientSide()) return;
 
         for (int attempt = 0; attempt < 16; attempt++) {
-            double angle = level.random.nextDouble() * Math.PI * 2;
-            double dist = minDist + level.random.nextDouble() * (maxDist - minDist);
+            double angle = level.getRandom().nextDouble() * Math.PI * 2;
+            double dist = minDist + level.getRandom().nextDouble() * (maxDist - minDist);
             double tx = entity.getX() + Math.cos(angle) * dist;
             double tz = entity.getZ() + Math.sin(angle) * dist;
             double ty = entity.getY();
@@ -2336,115 +2360,115 @@ public class ModEvents {
         return !s.isEmpty() && (s.is(ModItems.CACTUS_SWORD.get()) || s.is(ModItems.CACTUS_PICKAXE.get()) || s.is(ModItems.CACTUS_SHOVEL.get()) || s.is(ModItems.CACTUS_AXE.get()) || s.is(ModItems.CACTUS_HOE.get()));
     }
     private static boolean isCactusArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.CACTUS_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.CACTUS_HELMET.get(), ModItems.CACTUS_CHESTPLATE.get(),
+                ModItems.CACTUS_LEGGINGS.get(), ModItems.CACTUS_BOOTS.get());
     }
     private static boolean isBoneTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.BONE_SWORD.get()) || s.is(ModItems.BONE_PICKAXE.get()) || s.is(ModItems.BONE_SHOVEL.get()) || s.is(ModItems.BONE_AXE.get()) || s.is(ModItems.BONE_HOE.get()));
     }
     private static boolean isBoneArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.BONE_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.BONE_HELMET.get(), ModItems.BONE_CHESTPLATE.get(),
+                ModItems.BONE_LEGGINGS.get(), ModItems.BONE_BOOTS.get());
     }
     private static boolean isClayArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.CLAY_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.CLAY_HELMET.get(), ModItems.CLAY_CHESTPLATE.get(),
+                ModItems.CLAY_LEGGINGS.get(), ModItems.CLAY_BOOTS.get());
     }
     private static boolean isNetherBrickTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.NETHER_BRICK_SWORD.get()) || s.is(ModItems.NETHER_BRICK_PICKAXE.get()) || s.is(ModItems.NETHER_BRICK_SHOVEL.get()) || s.is(ModItems.NETHER_BRICK_AXE.get()) || s.is(ModItems.NETHER_BRICK_HOE.get()));
     }
     private static boolean isNetherBrickArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.NETHER_BRICK_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.NETHER_BRICK_HELMET.get(), ModItems.NETHER_BRICK_CHESTPLATE.get(),
+                ModItems.NETHER_BRICK_LEGGINGS.get(), ModItems.NETHER_BRICK_BOOTS.get());
     }
     private static boolean isCopperArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.COPPER_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.COPPER_HELMET.get(), ModItems.COPPER_CHESTPLATE.get(),
+                ModItems.COPPER_LEGGINGS.get(), ModItems.COPPER_BOOTS.get());
     }
     private static boolean isPhantomTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.PHANTOM_SWORD.get()) || s.is(ModItems.PHANTOM_PICKAXE.get()) || s.is(ModItems.PHANTOM_SHOVEL.get()) || s.is(ModItems.PHANTOM_AXE.get()) || s.is(ModItems.PHANTOM_HOE.get()));
     }
     private static boolean isPhantomArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.PHANTOM_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.PHANTOM_HELMET.get(), ModItems.PHANTOM_CHESTPLATE.get(),
+                ModItems.PHANTOM_LEGGINGS.get(), ModItems.PHANTOM_BOOTS.get());
     }
     private static boolean isMagmaCreamTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.MAGMA_CREAM_SWORD.get()) || s.is(ModItems.MAGMA_CREAM_PICKAXE.get()) || s.is(ModItems.MAGMA_CREAM_SHOVEL.get()) || s.is(ModItems.MAGMA_CREAM_AXE.get()) || s.is(ModItems.MAGMA_CREAM_HOE.get()));
     }
     private static boolean isMagmaCreamArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.MAGMA_CREAM_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.MAGMA_CREAM_HELMET.get(), ModItems.MAGMA_CREAM_CHESTPLATE.get(),
+                ModItems.MAGMA_CREAM_LEGGINGS.get(), ModItems.MAGMA_CREAM_BOOTS.get());
     }
     private static boolean isSlimeTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.SLIME_SWORD.get()) || s.is(ModItems.SLIME_PICKAXE.get()) || s.is(ModItems.SLIME_SHOVEL.get()) || s.is(ModItems.SLIME_AXE.get()) || s.is(ModItems.SLIME_HOE.get()));
     }
     private static boolean isSlimeArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.SLIME_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.SLIME_HELMET.get(), ModItems.SLIME_CHESTPLATE.get(),
+                ModItems.SLIME_LEGGINGS.get(), ModItems.SLIME_BOOTS.get());
     }
     private static boolean isBlazeTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.BLAZE_SWORD.get()) || s.is(ModItems.BLAZE_PICKAXE.get()) || s.is(ModItems.BLAZE_SHOVEL.get()) || s.is(ModItems.BLAZE_AXE.get()) || s.is(ModItems.BLAZE_HOE.get()));
     }
     private static boolean isBlazeArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.BLAZE_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.BLAZE_HELMET.get(), ModItems.BLAZE_CHESTPLATE.get(),
+                ModItems.BLAZE_LEGGINGS.get(), ModItems.BLAZE_BOOTS.get());
     }
     private static boolean isNautilusTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.NAUTILUS_SWORD.get()) || s.is(ModItems.NAUTILUS_PICKAXE.get()) || s.is(ModItems.NAUTILUS_SHOVEL.get()) || s.is(ModItems.NAUTILUS_AXE.get()) || s.is(ModItems.NAUTILUS_HOE.get()));
     }
     private static boolean isNautilusArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.NAUTILUS_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.NAUTILUS_HELMET.get(), ModItems.NAUTILUS_CHESTPLATE.get(),
+                ModItems.NAUTILUS_LEGGINGS.get(), ModItems.NAUTILUS_BOOTS.get());
     }
     private static boolean isPurpurTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.PURPUR_SWORD.get()) || s.is(ModItems.PURPUR_PICKAXE.get()) || s.is(ModItems.PURPUR_SHOVEL.get()) || s.is(ModItems.PURPUR_AXE.get()) || s.is(ModItems.PURPUR_HOE.get()));
     }
     private static boolean isPurpurArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.PURPUR_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.PURPUR_HELMET.get(), ModItems.PURPUR_CHESTPLATE.get(),
+                ModItems.PURPUR_LEGGINGS.get(), ModItems.PURPUR_BOOTS.get());
     }
     private static boolean isGhastTearTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.GHAST_TEAR_SWORD.get()) || s.is(ModItems.GHAST_TEAR_PICKAXE.get()) || s.is(ModItems.GHAST_TEAR_SHOVEL.get()) || s.is(ModItems.GHAST_TEAR_AXE.get()) || s.is(ModItems.GHAST_TEAR_HOE.get()));
     }
     private static boolean isGhastTearArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.GHAST_TEAR_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.GHAST_TEAR_HELMET.get(), ModItems.GHAST_TEAR_CHESTPLATE.get(),
+                ModItems.GHAST_TEAR_LEGGINGS.get(), ModItems.GHAST_TEAR_BOOTS.get());
     }
     private static boolean isEyeOfEnderTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.EYE_OF_ENDER_SWORD.get()) || s.is(ModItems.EYE_OF_ENDER_PICKAXE.get()) || s.is(ModItems.EYE_OF_ENDER_SHOVEL.get()) || s.is(ModItems.EYE_OF_ENDER_AXE.get()) || s.is(ModItems.EYE_OF_ENDER_HOE.get()));
     }
     private static boolean isEyeOfEnderArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.EYE_OF_ENDER_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.EYE_OF_ENDER_HELMET.get(), ModItems.EYE_OF_ENDER_CHESTPLATE.get(),
+                ModItems.EYE_OF_ENDER_LEGGINGS.get(), ModItems.EYE_OF_ENDER_BOOTS.get());
     }
     private static boolean isShulkerTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.SHULKER_SWORD.get()) || s.is(ModItems.SHULKER_PICKAXE.get()) || s.is(ModItems.SHULKER_SHOVEL.get()) || s.is(ModItems.SHULKER_AXE.get()) || s.is(ModItems.SHULKER_HOE.get()));
     }
     private static boolean isShulkerArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.SHULKER_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.SHULKER_HELMET.get(), ModItems.SHULKER_CHESTPLATE.get(),
+                ModItems.SHULKER_LEGGINGS.get(), ModItems.SHULKER_BOOTS.get());
     }
     private static boolean isTurtleScuteArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.TURTLE_SCUTE_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.TURTLE_SCUTE_HELMET.get(), ModItems.TURTLE_SCUTE_CHESTPLATE.get(),
+                ModItems.TURTLE_SCUTE_LEGGINGS.get(), ModItems.TURTLE_SCUTE_BOOTS.get());
     }
     private static boolean isEchoShardTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.ECHO_SHARD_SWORD.get()) || s.is(ModItems.ECHO_SHARD_PICKAXE.get()) || s.is(ModItems.ECHO_SHARD_SHOVEL.get()) || s.is(ModItems.ECHO_SHARD_AXE.get()) || s.is(ModItems.ECHO_SHARD_HOE.get()));
     }
     private static boolean isEchoShardArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.ECHO_SHARD_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.ECHO_SHARD_HELMET.get(), ModItems.ECHO_SHARD_CHESTPLATE.get(),
+                ModItems.ECHO_SHARD_LEGGINGS.get(), ModItems.ECHO_SHARD_BOOTS.get());
     }
     private static boolean isDragonBreathTool(ItemStack s) {
         return !s.isEmpty() && (s.is(ModItems.DRAGON_BREATH_SWORD.get()) || s.is(ModItems.DRAGON_BREATH_PICKAXE.get()) || s.is(ModItems.DRAGON_BREATH_SHOVEL.get()) || s.is(ModItems.DRAGON_BREATH_AXE.get()) || s.is(ModItems.DRAGON_BREATH_HOE.get()));
     }
     private static boolean isDragonBreathArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.DRAGON_BREATH_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.DRAGON_BREATH_HELMET.get(), ModItems.DRAGON_BREATH_CHESTPLATE.get(),
+                ModItems.DRAGON_BREATH_LEGGINGS.get(), ModItems.DRAGON_BREATH_BOOTS.get());
     }
     private static boolean isRabbitHideArmor(ItemStack s) {
-        if (s.isEmpty() || !(s.getItem() instanceof ArmorItem a)) return false;
-        return ModArmorMaterials.RABBIT_HIDE_ARMOR_MATERIAL.is(a.getMaterial());
+        return matchesArmorSet(s, ModItems.RABBIT_HIDE_HELMET.get(), ModItems.RABBIT_HIDE_CHESTPLATE.get(),
+                ModItems.RABBIT_HIDE_LEGGINGS.get(), ModItems.RABBIT_HIDE_BOOTS.get());
     }
 
     // =======================================================================
@@ -2486,12 +2510,12 @@ public class ModEvents {
 
     private static void handleRabbitHideArmor(Player player) {
         if (isRabbitHideArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isRabbitHideArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isRabbitHideArmor)) {
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 2, false, false, true));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 2, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
             player.fallDistance = 0;
         }
     }
@@ -2518,11 +2542,11 @@ public class ModEvents {
 
     private static void handleClayArmor(Player player) {
         if (isClayArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isClayArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isClayArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isClayArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.LUCK, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isClayArmor))
@@ -2542,24 +2566,24 @@ public class ModEvents {
         boolean inRain = player.level().isRainingAt(player.blockPosition());
         if (!inRain) return;
         if (isCopperArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isCopperArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isCopperArmor) && player.level().isThundering())
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 60, 0, false, false, true));
     }
 
     private static void handlePhantomEffects(Player player) {
         ItemStack held = player.getMainHandItem();
         if (isPhantomTool(held))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
-        boolean night = !player.level().isDay();
+        boolean night = !player.level().isBrightOutside();
         if (isPhantomArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
         if (night && isPhantomArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (night && isPhantomArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isPhantomArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, true));
     }
@@ -2568,16 +2592,16 @@ public class ModEvents {
         if (isMagmaCreamArmor(player.getItemBySlot(EquipmentSlot.FEET)) || isMagmaCreamArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false, true));
         if (isMagmaCreamArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
     }
 
     private static void handleSlimeEffects(Player player) {
         if (isSlimeArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 1, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 1, false, false, true));
         if (isSlimeArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isSlimeArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isSlimeArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isSlimeArmor))
@@ -2592,7 +2616,7 @@ public class ModEvents {
             }
         }
         if (isWearingFullSet(player, ModEvents::isBlazeArmor))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 60, 0, false, false, true));
     }
 
     private static void handleNautilusEffects(Player player) {
@@ -2600,11 +2624,11 @@ public class ModEvents {
             player.addEffect(new MobEffectInstance(MobEffects.CONDUIT_POWER, 60, 0, false, false, true));
         if (!player.isInWater()) return;
         if (isNautilusArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isNautilusArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
             player.addEffect(new MobEffectInstance(MobEffects.CONDUIT_POWER, 60, 0, false, false, true));
         if (isNautilusArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isNautilusArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 220, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isNautilusArmor))
@@ -2617,9 +2641,9 @@ public class ModEvents {
         if (isPurpurArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
         if (isPurpurArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isPurpurArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isPurpurArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, true));
     }
@@ -2628,11 +2652,11 @@ public class ModEvents {
         if (isGhastTearTool(player.getMainHandItem()))
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, false, false, true));
         if (isGhastTearArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isGhastTearArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, false, false, true));
         if (isGhastTearArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isGhastTearArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isGhastTearArmor)) {
@@ -2645,11 +2669,11 @@ public class ModEvents {
         if (isEyeOfEnderTool(player.getMainHandItem()))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, true));
         if (isEyeOfEnderArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isEyeOfEnderArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 0, false, false, true));
         if (isEyeOfEnderArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isEyeOfEnderArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isEyeOfEnderArmor) && player.tickCount % 20 == 0) {
@@ -2663,17 +2687,17 @@ public class ModEvents {
 
     private static void handleShulkerEffects(Player player) {
         if (isShulkerTool(player.getMainHandItem()) && !player.onGround())
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 60, 0, false, false, true));
         if (isShulkerArmor(player.getItemBySlot(EquipmentSlot.FEET)))
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
         if (isShulkerArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 1, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 1, false, false, true));
         if (isShulkerArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isShulkerArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isShulkerArmor)) {
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60, 2, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 60, 2, false, false, true));
             player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
             player.fallDistance = 0;
         }
@@ -2684,9 +2708,9 @@ public class ModEvents {
             player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 220, 0, false, false, true));
         if (player.isInWater()) {
             if (isTurtleScuteArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
             if (isTurtleScuteArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
             if (isTurtleScuteArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
                 player.addEffect(new MobEffectInstance(MobEffects.CONDUIT_POWER, 60, 0, false, false, true));
             if (isWearingFullSet(player, ModEvents::isTurtleScuteArmor)) {
@@ -2694,18 +2718,18 @@ public class ModEvents {
                 player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 60, 0, false, false, true));
             }
         } else if (isWearingFullSet(player, ModEvents::isTurtleScuteArmor)) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 0, false, false, true));
         }
     }
 
     private static void handleEchoShardEffects(Player player) {
         if (isEchoShardArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isEchoShardArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 0, false, false, true));
         if (isEchoShardArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 1, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 1, false, false, true));
         if (isEchoShardArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, true));
         boolean toolHeld = isEchoShardTool(player.getMainHandItem());
@@ -2721,20 +2745,20 @@ public class ModEvents {
 
     private static void handleDragonBreathEffects(Player player) {
         if (isDragonBreathTool(player.getMainHandItem())) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 60, 0, false, false, true));
             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false, true));
         }
         if (isDragonBreathArmor(player.getItemBySlot(EquipmentSlot.FEET)))
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0, false, false, true));
         if (isDragonBreathArmor(player.getItemBySlot(EquipmentSlot.LEGS)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 60, 0, false, false, true));
         if (isDragonBreathArmor(player.getItemBySlot(EquipmentSlot.CHEST)))
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 1, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 1, false, false, true));
         if (isDragonBreathArmor(player.getItemBySlot(EquipmentSlot.HEAD)))
             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false, true));
         if (isWearingFullSet(player, ModEvents::isDragonBreathArmor)) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 60, 1, false, false, true));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 1, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 60, 1, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 60, 1, false, false, true));
         }
     }
 }

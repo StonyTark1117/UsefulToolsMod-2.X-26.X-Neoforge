@@ -21,7 +21,7 @@ public final class CoalBurningHelper {
         if (stack.isEmpty()) return false;
         CustomData data = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
         if (data.isEmpty()) return false;
-        return data.copyTag().getBoolean(TAG_KEY);
+        return data.copyTag().getBooleanOr(TAG_KEY, false);
     }
 
     public static void setBurning(ItemStack stack, boolean burning) {

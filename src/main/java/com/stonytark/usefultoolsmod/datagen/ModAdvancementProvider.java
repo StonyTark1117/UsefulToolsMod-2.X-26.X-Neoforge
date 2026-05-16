@@ -11,16 +11,20 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.critereon.ConsumeItemTrigger;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.criterion.ConsumeItemTrigger;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +34,7 @@ import java.util.function.Consumer;
 public class ModAdvancementProvider extends AdvancementProvider {
 
     public ModAdvancementProvider(PackOutput output,
-                                   CompletableFuture<HolderLookup.Provider> lookupProvider,
-                                   ExistingFileHelper efh) {
+                                   CompletableFuture<HolderLookup.Provider> lookupProvider) {
         super(output, lookupProvider, List.of(new UsefulToolsAdvancements()));
     }
 
@@ -40,12 +43,30 @@ public class ModAdvancementProvider extends AdvancementProvider {
     // -----------------------------------------------------------------------
     static class UsefulToolsAdvancements implements AdvancementSubProvider {
 
-        private static final ResourceLocation BACKGROUND =
-                ResourceLocation.withDefaultNamespace("textures/block/netherrack.png");
+        private static final Identifier BACKGROUND =
+                Identifier.withDefaultNamespace("textures/block/netherrack.png");
+
+        /** Captured from {@link #generate} so the {@code static} helper methods that build
+         *  per-set advancements (e.g. {@code buildFoodAdv}) can still resolve item holders
+         *  for {@link ConsumeItemTrigger.TriggerInstance#usedItem}. */
+        private static HolderGetter<Item> ITEMS_LOOKUP;
+
+        /**
+         * 26.1: {@code usedItem(items, Item)} no longer exists.
+         * The replacement takes either an {@link ItemPredicate.Builder} or a
+         * {@code (HolderGetter<Item>, ItemLike)} pair; this helper wraps the latter so the
+         * call sites read like the old single-arg form.
+         */
+        private static net.minecraft.advancements.Criterion<ConsumeItemTrigger.TriggerInstance> usedItem(
+                HolderGetter<Item> items, ItemLike item) {
+            return ConsumeItemTrigger.TriggerInstance.usedItem(items, item);
+        }
 
         @Override
         public void generate(HolderLookup.Provider registries,
                              Consumer<AdvancementHolder> saver) {
+            HolderGetter<Item> items = registries.lookupOrThrow(Registries.ITEM);
+            ITEMS_LOOKUP = items;
 
             // ==================================================================
             // ROOT
@@ -1329,15 +1350,15 @@ public class ModAdvancementProvider extends AdvancementProvider {
                     .display(Items.CAKE, title("the_cake_is_a_lie"), desc("the_cake_is_a_lie"),
                             null, AdvancementType.TASK, true, true, true)
                     .addCriterion("eat_cake_sword",
-                            ConsumeItemTrigger.TriggerInstance.usedItem(ModItems.CAKE_SWORD.get()))
+                            usedItem(items, ModItems.CAKE_SWORD.get()))
                     .addCriterion("eat_cake_pickaxe",
-                            ConsumeItemTrigger.TriggerInstance.usedItem(ModItems.CAKE_PICKAXE.get()))
+                            usedItem(items, ModItems.CAKE_PICKAXE.get()))
                     .addCriterion("eat_cake_axe",
-                            ConsumeItemTrigger.TriggerInstance.usedItem(ModItems.CAKE_AXE.get()))
+                            usedItem(items, ModItems.CAKE_AXE.get()))
                     .addCriterion("eat_cake_shovel",
-                            ConsumeItemTrigger.TriggerInstance.usedItem(ModItems.CAKE_SHOVEL.get()))
+                            usedItem(items, ModItems.CAKE_SHOVEL.get()))
                     .addCriterion("eat_cake_hoe",
-                            ConsumeItemTrigger.TriggerInstance.usedItem(ModItems.CAKE_HOE.get()))
+                            usedItem(items, ModItems.CAKE_HOE.get()))
                     .requirements(AdvancementRequirements.Strategy.OR)
                     .save(saver, id("the_cake_is_a_lie"));
 
@@ -1451,7 +1472,7 @@ public class ModAdvancementProvider extends AdvancementProvider {
                             null, AdvancementType.TASK, true, true, true);
             for (int i = 0; i < tools.length; i++) {
                 eat.addCriterion("eat_tool_" + i,
-                        ConsumeItemTrigger.TriggerInstance.usedItem(tools[i]));
+                        usedItem(ITEMS_LOOKUP, tools[i]));
             }
             AdvancementHolder eatAdv = eat.requirements(AdvancementRequirements.Strategy.OR)
                     .save(saver, id(eatKey));

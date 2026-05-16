@@ -1,13 +1,12 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.Tier;
 
-public class CoalShovelItem extends ShovelItem {
+public class CoalShovelItem extends Item {
 
-    public CoalShovelItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public CoalShovelItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

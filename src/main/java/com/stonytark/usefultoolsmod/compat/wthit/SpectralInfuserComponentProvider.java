@@ -15,16 +15,16 @@ public class SpectralInfuserComponentProvider implements IBlockComponentProvider
         CompoundTag data = accessor.getData().raw();
         if (data == null) return;
 
-        int progress = data.getInt("utm_progress");
-        int maxProgress = data.getInt("utm_maxProgress");
+        int progress = data.getIntOr("utm_progress", 0);
+        int maxProgress = data.getIntOr("utm_maxProgress", 0);
 
         if (data.contains("utm_outputName")) {
-            String outputName = data.getString("utm_outputName");
+            String outputName = data.getStringOr("utm_outputName", "");
             tooltip.addLine(Component.literal("Output: ")
                     .withStyle(ChatFormatting.GREEN)
                     .append(Component.literal(outputName).withStyle(ChatFormatting.WHITE)));
         } else if (data.contains("utm_inputName")) {
-            String inputName = data.getString("utm_inputName");
+            String inputName = data.getStringOr("utm_inputName", "");
 
             if (progress > 0 && maxProgress > 0) {
                 int percent = (progress * 100) / maxProgress;
@@ -37,7 +37,7 @@ public class SpectralInfuserComponentProvider implements IBlockComponentProvider
                 tooltip.addLine(Component.literal("Input: ")
                         .withStyle(ChatFormatting.YELLOW)
                         .append(Component.literal(inputName).withStyle(ChatFormatting.WHITE)));
-                if (!data.getBoolean("utm_hasFuel")) {
+                if (!data.getBooleanOr("utm_hasFuel", false)) {
                     tooltip.addLine(Component.literal("Needs Ectoplasm")
                             .withStyle(ChatFormatting.RED));
                 }

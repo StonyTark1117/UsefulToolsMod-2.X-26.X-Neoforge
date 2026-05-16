@@ -4,43 +4,27 @@ import com.stonytark.usefultoolsmod.block.custom.SpectralInfuserBlock;
 import com.stonytark.usefultoolsmod.item.ModItems;
 import com.stonytark.usefultoolsmod.item.custom.EctoplasmInfusionHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvider, Container {
-    private final ItemStackHandler itemHandler = new ItemStackHandler(3) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            setChanged();
-        }
-
-        @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return switch (slot) {
-                case 0 -> isInfusable(stack);
-                case 1 -> stack.is(ModItems.ECTOPLASM.get());
-                case 2 -> false; // output only
-                default -> false;
-            };
-        }
-    };
+    private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
 
     private int progress = 0;
     private int maxProgress = 200;
@@ -73,8 +57,8 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
         super(ModBlockEntityTypes.SPECTRAL_INFUSER.get(), pos, state);
     }
 
-    public ItemStackHandler getItemHandler() {
-        return itemHandler;
+    public NonNullList<ItemStack> getItems() {
+        return items;
     }
 
     public ContainerData getData() {
@@ -85,37 +69,43 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
 
     @Override
     public int getContainerSize() {
-        return itemHandler.getSlots();
+        return items.size();
     }
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            if (!itemHandler.getStackInSlot(i).isEmpty()) return false;
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) return false;
         }
         return true;
     }
 
     @Override
     public ItemStack getItem(int slot) {
-        return itemHandler.getStackInSlot(slot);
+        return items.get(slot);
     }
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-        return itemHandler.extractItem(slot, amount, false);
+        ItemStack result = ContainerHelper.removeItem(items, slot, amount);
+        if (!result.isEmpty()) {
+            setChanged();
+        }
+        return result;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        ItemStack stack = itemHandler.getStackInSlot(slot);
-        itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
-        return stack;
+        return ContainerHelper.takeItem(items, slot);
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        itemHandler.setStackInSlot(slot, stack);
+        items.set(slot, stack);
+        if (stack.getCount() > getMaxStackSize()) {
+            stack.setCount(getMaxStackSize());
+        }
+        setChanged();
     }
 
     @Override
@@ -125,9 +115,16 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
 
     @Override
     public void clearContent() {
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
-        }
+        items.clear();
+    }
+
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return switch (slot) {
+            case 0 -> isInfusable(stack);
+            case 1 -> stack.is(ModItems.ECTOPLASM.get());
+            case 2 -> false; // output only
+            default -> false;
+        };
     }
 
     // ── MenuProvider ────────────────────────────────────────────────────────
@@ -146,17 +143,17 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
     // ── Serialization ───────────────────────────────────────────────────────
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-        super.saveAdditional(tag, provider);
-        tag.put("inventory", itemHandler.serializeNBT(provider));
-        tag.putInt("progress", progress);
+    protected void saveAdditional(ValueOutput out) {
+        super.saveAdditional(out);
+        ContainerHelper.saveAllItems(out, this.items);
+        out.putInt("progress", progress);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-        super.loadAdditional(tag, provider);
-        itemHandler.deserializeNBT(provider, tag.getCompound("inventory"));
-        progress = tag.getInt("progress");
+    protected void loadAdditional(ValueInput in) {
+        super.loadAdditional(in);
+        ContainerHelper.loadAllItems(in, this.items);
+        progress = in.getIntOr("progress", 0);
     }
 
     // ── Tick / Processing ───────────────────────────────────────────────────
@@ -186,15 +183,15 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
     }
 
     private boolean hasRecipe() {
-        ItemStack input = itemHandler.getStackInSlot(0);
-        ItemStack fuel = itemHandler.getStackInSlot(1);
-        ItemStack output = itemHandler.getStackInSlot(2);
+        ItemStack input = items.get(0);
+        ItemStack fuel = items.get(1);
+        ItemStack output = items.get(2);
         return isInfusable(input) && fuel.is(ModItems.ECTOPLASM.get())
                 && !fuel.isEmpty() && output.isEmpty();
     }
 
     private void craftItem() {
-        ItemStack input = itemHandler.getStackInSlot(0);
+        ItemStack input = items.get(0);
         ItemStack result;
 
         if (input.is(Items.EGG)) {
@@ -209,9 +206,9 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
             EctoplasmInfusionHelper.setInfused(result, true);
         }
 
-        itemHandler.setStackInSlot(2, result);
-        itemHandler.setStackInSlot(0, ItemStack.EMPTY);
-        itemHandler.getStackInSlot(1).shrink(1);
+        items.set(2, result);
+        items.set(0, ItemStack.EMPTY);
+        items.get(1).shrink(1);
     }
 
     private void resetProgress() {
@@ -220,8 +217,8 @@ public class SpectralInfuserBlockEntity extends BlockEntity implements MenuProvi
 
     public static boolean isInfusable(ItemStack stack) {
         if (stack.isEmpty()) return false;
-        return stack.getItem() instanceof TieredItem
-                || stack.getItem() instanceof ArmorItem
+        return stack.has(DataComponents.TOOL)
+                || stack.has(DataComponents.EQUIPPABLE)
                 || stack.is(Items.EGG);
     }
 }

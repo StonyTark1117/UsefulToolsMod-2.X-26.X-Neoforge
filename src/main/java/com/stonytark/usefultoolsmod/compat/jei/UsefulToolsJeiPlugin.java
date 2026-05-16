@@ -9,12 +9,11 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TieredItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +22,8 @@ import java.util.List;
 public class UsefulToolsJeiPlugin implements IModPlugin {
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "jei_plugin");
+    public Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "jei_plugin");
     }
 
     @Override
@@ -39,8 +38,8 @@ public class UsefulToolsJeiPlugin implements IModPlugin {
         ItemStack ectoplasm = new ItemStack(ModItems.ECTOPLASM.get());
 
         BuiltInRegistries.ITEM.forEach(item -> {
-            if (item instanceof TieredItem || item instanceof ArmorItem) {
-                ItemStack input = new ItemStack(item);
+            ItemStack input = new ItemStack(item);
+            if (input.has(DataComponents.TOOL) || input.has(DataComponents.EQUIPPABLE)) {
                 ItemStack output = input.copy();
                 EctoplasmInfusionHelper.setInfused(output, true);
                 recipes.add(new SpectralInfuserRecipe(input, ectoplasm, output));

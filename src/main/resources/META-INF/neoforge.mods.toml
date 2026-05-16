@@ -1,7 +1,7 @@
-# This is the NeoForge mods.toml file for NeoForge 1.21.1+
+# This is the NeoForge mods.toml file for NeoForge 26.1+
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
-# A version range to match for said mod loader - for NeoForge 1.21.1 FML version is 4.x
+# A version range to match for said mod loader - for NeoForge 26.1 FML version is 5.x
 loaderVersion="${loader_version_range}" #mandatory
 # The license for your mod
 license="${mod_license}"
@@ -42,27 +42,37 @@ description='''${mod_description}'''
     ordering="NONE"
     side="BOTH"
 
-# Optional integration: JEI
+# Optional integration: JEI (26.1 line — older JEI builds are MC-1.21.1-only)
 [[dependencies.${mod_id}]]
     modId="jei"
     type="optional"
-    versionRange="[19.0.0,)"
+    versionRange="[29.0.0,)"
     ordering="AFTER"
     side="CLIENT"
 
-# Optional integration: WTHIT (mod id is "waila")
+# Optional integration: WTHIT (mod id is "waila"; 19.x is the NeoForge 26.1 line)
 [[dependencies.${mod_id}]]
     modId="waila"
     type="optional"
-    versionRange="[12.0.0,)"
+    versionRange="[19.0.0,)"
     ordering="AFTER"
     side="BOTH"
 
-# Optional integration: Cloth Config (in-game config screen)
+# Optional integration: Cloth Config (in-game config screen; 26.1.x line)
 [[dependencies.${mod_id}]]
     modId="cloth_config"
     type="optional"
-    versionRange="[15.0.0,)"
+    versionRange="[26.1.0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+# Optional integration: Just Enough Resources (JER). Registers this mod's
+# ore worldgen distributions with JER's WorldGen tab. Plugin class is
+# loaded only when the mod is present (lazy classload behind ModList).
+[[dependencies.${mod_id}]]
+    modId="jeresources"
+    type="optional"
+    versionRange="[${jer_mod_version},)"
     ordering="AFTER"
     side="CLIENT"
 

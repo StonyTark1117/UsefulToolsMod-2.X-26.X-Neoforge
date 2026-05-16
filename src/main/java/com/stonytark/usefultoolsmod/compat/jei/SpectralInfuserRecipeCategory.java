@@ -13,20 +13,21 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.GuiGraphics;
+// 1.21.6+: net.minecraft.client.gui.GuiGraphics was renamed to GuiGraphicsExtractor.
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class SpectralInfuserRecipeCategory implements IRecipeCategory<SpectralInfuserRecipe> {
 
     public static final RecipeType<SpectralInfuserRecipe> TYPE =
-            new RecipeType<>(ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "spectral_infusion"),
+            new RecipeType<>(Identifier.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "spectral_infusion"),
                     SpectralInfuserRecipe.class);
 
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "textures/gui/spectral_infuser.png");
+    private static final Identifier TEXTURE =
+            Identifier.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "textures/gui/spectral_infuser.png");
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -67,7 +68,7 @@ public class SpectralInfuserRecipeCategory implements IRecipeCategory<SpectralIn
     }
 
     @Override
-    public void draw(SpectralInfuserRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics,
+    public void draw(SpectralInfuserRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics,
                      double mouseX, double mouseY) {
         background.draw(guiGraphics);
         arrow.draw(guiGraphics, 36, 21);

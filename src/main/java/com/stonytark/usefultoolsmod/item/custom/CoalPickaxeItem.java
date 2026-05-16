@@ -1,13 +1,12 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
 
-public class CoalPickaxeItem extends PickaxeItem {
+public class CoalPickaxeItem extends Item {
 
-    public CoalPickaxeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public CoalPickaxeItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

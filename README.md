@@ -13,16 +13,18 @@ A simple Minecraft mod adding various tools and armor based on reinforced versio
 
 ## Compatibility
 
-- **Minecraft:** 1.21.1
-- **Loader:** NeoForge 21.1.219+
+- **Minecraft:** 26.1.2
+- **Loader:** NeoForge 26.1.0.1-beta+
+- **Java:** 25 (toolchain configured automatically via foojay-resolver)
 
 ### Optional integrations
 
 The mod does not require any of these — it detects them at runtime and adds the integration only if they're present.
 
-- **JEI** 19.27.0.340+ — Spectral Infuser shows up as its own recipe category with every supported tool/armor input listed
-- **WTHIT (waila)** 12.10.1+ — Ghosts display ectoplasm armor info
-- **Cloth Config** 15.0.140+ — Adds an in-game config screen accessible from the mod list
+- **JEI** 29.5.0.28+ — Spectral Infuser shows up as its own recipe category with every supported tool/armor input listed
+- **WTHIT (waila)** 19.0.1+ — Ghosts display ectoplasm armor info
+- **Cloth Config** 26.1.154+ — Adds an in-game config screen accessible from the mod list
+- **Just Enough Resources (JER)** — registers ore distributions in JER's WorldGen tab. *Currently disabled in `build.gradle`; will be enabled once JER publishes a 26.1 build on Modrinth.*
 
 ## Building
 
@@ -30,7 +32,12 @@ The mod does not require any of these — it detects them at runtime and adds th
 ./gradlew build
 ```
 
-The output jar lands at `build/libs/usefultoolsmod-2.2.1-1.21.1-neoforge.jar`.
+The output jar lands at `build/libs/usefultoolsmod-2.2.3-26.1.2-neoforge.jar`.
+
+> If your default JDK is newer than Java 25 (e.g. Java 26), Gradle's embedded Groovy
+> may reject the build script. Either install Java 25 or run with an explicit override:
+> `JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew build` (Gradle itself runs on the
+> JAVA_HOME JDK; the mod is still compiled against Java 25 via the toolchain).
 
 ## License
 

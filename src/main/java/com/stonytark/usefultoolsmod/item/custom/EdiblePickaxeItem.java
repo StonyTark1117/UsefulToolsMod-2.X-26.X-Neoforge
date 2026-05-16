@@ -1,15 +1,14 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 
-public class EdiblePickaxeItem extends PickaxeItem {
+public class EdiblePickaxeItem extends Item {
 
-    public EdiblePickaxeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EdiblePickaxeItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

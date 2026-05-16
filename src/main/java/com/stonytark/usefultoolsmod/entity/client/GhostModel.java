@@ -2,32 +2,43 @@ package com.stonytark.usefultoolsmod.entity.client;
 
 // Made with Blockbench 5.0.0
 // Exported for Minecraft version 1.17 or later with Mojang mappings
-// Paste this class into your mod and generate all required imports
+// Migrated 1.21.1 -> 26.1: now generic over GhostRenderState (see §7.1-7.5 of MIGRATION_CHEATSHEET).
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.stonytark.usefultoolsmod.UsefultoolsMod;
-import com.stonytark.usefultoolsmod.entity.custom.GhostEntity;
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.animation.KeyframeAnimation;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 
-public class GhostModel<T extends GhostEntity> extends HierarchicalModel<T> {
+public class GhostModel extends EntityModel<GhostRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "ghost"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, "ghost"), "main");
     private final ModelPart body;
     private final ModelPart head;
+    // 1.21.9+: animations are AnimationDefinitions baked onto a specific ModelPart subtree;
+    // the resulting KeyframeAnimation is what's applied each frame.
+    private final KeyframeAnimation idleAnimation;
+    private final KeyframeAnimation walkAnimation;
 
 
     public GhostModel(ModelPart root) {
+        // The bake operation returns the top-level ModelPart whose single named child is
+        // "body" (see createBodyLayer). The old code overrode HierarchicalModel#root() to
+        // return that "body" subtree because the geometry is offset (0, 24, 0) inside it.
+        // Post-1.21.2 EntityModel takes the rendered root in its constructor, so pass the
+        // "body" subtree directly.
+        super(root.getChild("body"));
         this.body = root.getChild("body");
-        this.head = body.getChild("head");
+        // "head" is a child of "body", not of the unnamed top-level root.
+        this.head = this.body.getChild("head");
+        this.idleAnimation = GhostAnimations.ANIM_GHOST_IDLE.bake(this.body);
+        this.walkAnimation = GhostAnimations.ANIM_GHOST_WALKING.bake(this.body);
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -52,12 +63,23 @@ public class GhostModel<T extends GhostEntity> extends HierarchicalModel<T> {
     }
 
     @Override
-    public void setupAnim(GhostEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.applyHeadRotation(netHeadYaw, headPitch);
+    public void setupAnim(GhostRenderState state) {
+        super.setupAnim(state);
 
-        this.animateWalk(GhostAnimations.ANIM_GHOST_WALKING, limbSwing, limbSwingAmount, 2f, 2.5f);
-        this.animate(entity.idleAnimationState, GhostAnimations.ANIM_GHOST_IDLE, ageInTicks, 1f);
+        // Re-pose every part to its rest pose before applying animations.
+        // (HierarchicalModel did this automatically; EntityModel base in some versions
+        // does too via super.setupAnim, but being explicit is harmless and protects us
+        // across minor version shifts in 1.21.x.)
+        this.body.getAllParts().forEach(ModelPart::resetPose);
+
+        // Head rotation now comes from the render state (yRot/xRot are network-yaw/pitch
+        // already extracted in MobRenderer#extractRenderState).
+        this.applyHeadRotation(state.yRot, state.xRot);
+
+        // 1.21.9+: animations are KeyframeAnimation instances applied per-frame.
+        // The values (2.0f, 2.5f) match the original animateWalk scaling.
+        this.walkAnimation.applyWalk(state.walkAnimationPos, state.walkAnimationSpeed, 2.0f, 2.5f);
+        this.idleAnimation.apply(state.idleAnimationState, state.ageInTicks);
     }
 
     private void applyHeadRotation(float pNetHeadYaw, float pHeadPitch) {
@@ -67,15 +89,4 @@ public class GhostModel<T extends GhostEntity> extends HierarchicalModel<T> {
         this.head.yRot = pNetHeadYaw * ((float)Math.PI / 180F);
         this.head.xRot = pHeadPitch * ((float)Math.PI / 180F);
     }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-        body.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-    }
-
-    @Override
-    public ModelPart root(){
-        return body;
-    }
-
 }

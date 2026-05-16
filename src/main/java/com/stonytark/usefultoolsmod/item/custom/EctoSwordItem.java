@@ -1,13 +1,16 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
 
-public class EctoSwordItem extends SwordItem {
+/**
+ * Ectoplasm-forged sword: pre-infused so it can damage ghosts without using the Spectral Infuser.
+ * Tool shape is applied via Item.Properties#sword(...) at registration in 1.21.5+.
+ */
+public class EctoSwordItem extends Item {
 
-    public EctoSwordItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EctoSwordItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

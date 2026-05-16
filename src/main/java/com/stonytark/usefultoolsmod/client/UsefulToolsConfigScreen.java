@@ -9,12 +9,10 @@ import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Map;
 
-@OnlyIn(Dist.CLIENT)
 public final class UsefulToolsConfigScreen {
     private UsefulToolsConfigScreen() {}
 

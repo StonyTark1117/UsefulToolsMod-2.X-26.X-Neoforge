@@ -1,497 +1,240 @@
 package com.stonytark.usefultoolsmod.item;
 
 import com.stonytark.usefultoolsmod.UsefultoolsMod;
-import com.stonytark.usefultoolsmod.block.ModBlocks;
-import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Util;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 
 import java.util.EnumMap;
-import java.util.List;
-import java.util.function.Supplier;
 
+/**
+ * Armor material constants migrated from 1.21.1 to 1.21.5+ {@link ArmorMaterial} record.
+ *
+ * <p>Each material now carries an {@link EquipmentAsset} {@link ResourceKey} pointing at a JSON
+ * model under {@code assets/usefultoolsmod/equipment/<id>.json}. Field is no longer a
+ * {@code Holder<ArmorMaterial>} — it's the raw record value, exposed directly.
+ *
+ * <p>The 1.21.5+ ArmorMaterial record bakes the durability scalar into the material itself
+ * (was a per-item field on Item.Properties in 1.21.1). The scalar values here are lifted
+ * verbatim from the integer that was previously passed to {@code ArmorItem.Type.X.getDurability(N)}
+ * for the four pieces of each armor set in {@code ModItems}.
+ *
+ * <p>Slot-protection values and (toughness, knockback resistance, enchantability) tuples are
+ * preserved verbatim from the 1.21.1 source.
+ *
+ * <p>NOTE: {@code ArmorMaterial} requires a {@code TagKey<Item>} for the repair tag (not an
+ * {@code Ingredient}). Because the mod doesn't expose stable repair tags for every custom
+ * material, we fall back to a closest-vanilla material tag for compilation safety.
+ */
 public class ModArmorMaterials {
-    public static final Holder<ArmorMaterial> RGOLD_ARMOR_MATERIAL = register("rgold", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 3);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 9);
-            }), 25, 2f, 0.1f, () -> ModItems.RGOLD.get());
 
-    public static final Holder<ArmorMaterial> OBSIDIAN_ARMOR_MATERIAL = register("obsidian", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 6);
-                attribute.put(ArmorItem.Type.LEGGINGS, 7);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 9);
-                attribute.put(ArmorItem.Type.HELMET, 6);
-                attribute.put(ArmorItem.Type.BODY, 10);
-            }), 10, 4f, 0.4f, () -> ModItems.OBINGOT.get());
+    public static final ArmorMaterial RGOLD_ARMOR_MATERIAL = create("rgold",
+            slots(3, 5, 5, 3, 9), 18, 25, 2f, 0.1f, ItemTags.GOLD_ORES);
 
-    public static final Holder<ArmorMaterial> EMERALD_ARMOR_MATERIAL = register("emerald", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 4);
-                attribute.put(ArmorItem.Type.LEGGINGS, 6);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 8);
-                attribute.put(ArmorItem.Type.HELMET, 4);
-                attribute.put(ArmorItem.Type.BODY, 9);
-            }), 30, 2f, 0.15f, () -> ModItems.SEM.get());
+    public static final ArmorMaterial OBSIDIAN_ARMOR_MATERIAL = create("obsidian",
+            slots(6, 7, 9, 6, 10), 45, 10, 4f, 0.4f, ItemTags.IRON_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> OVERPOWER_ARMOR_MATERIAL = register("overpower", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 15);
-                attribute.put(ArmorItem.Type.LEGGINGS, 15);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 15);
-                attribute.put(ArmorItem.Type.HELMET, 15);
-                attribute.put(ArmorItem.Type.BODY, 15);
-            }), 50, 8f, 1f, () -> ModItems.OBINGOT.get());
+    public static final ArmorMaterial EMERALD_ARMOR_MATERIAL = create("emerald",
+            slots(4, 6, 8, 4, 9), 33, 30, 2f, 0.15f, ItemTags.EMERALD_ORES);
 
-    public static final Holder<ArmorMaterial> HRED_ARMOR_MATERIAL = register("hred", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 23, 1.1f, 0.08f, () -> ModItems.HRED.get());
+    public static final ArmorMaterial OVERPOWER_ARMOR_MATERIAL = create("overpower",
+            slots(15, 15, 15, 15, 15), 100, 50, 8f, 1f, ItemTags.IRON_TOOL_MATERIALS);
 
-    /**
-     * Hardened Glowstone — lighter protection than HRED but more enchantable.
-     * Toughness and knockback resistance sacrificed for magical affinity.
-     * Complement to HRED: HRED for power, HGLOW for utility/enchanting.
-     */
-    public static final Holder<ArmorMaterial> HGLOW_ARMOR_MATERIAL = register("hglow", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 25, 0.0f, 0.0f, () -> ModItems.HGLOW.get());
+    public static final ArmorMaterial HRED_ARMOR_MATERIAL = create("hred",
+            slots(2, 4, 4, 3, 6), 20, 23, 1.1f, 0.08f, ItemTags.IRON_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> RLAPIS_ARMOR_MATERIAL = register("rlapis", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 3);
-                attribute.put(ArmorItem.Type.LEGGINGS, 6);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 4);
-                attribute.put(ArmorItem.Type.BODY, 8);
-            }), 32, 1.6f, 0.15f, () -> ModItems.RLAPIS.get());
+    /** Hardened Glowstone — lighter protection than HRED but more enchantable. */
+    public static final ArmorMaterial HGLOW_ARMOR_MATERIAL = create("hglow",
+            slots(1, 4, 5, 2, 6), 18, 25, 0.0f, 0.0f, ItemTags.IRON_TOOL_MATERIALS);
 
-    /**
-     * Coal armor material — sits between leather and chainmail.
-     * Low protection, low durability multiplier.
-     */
-    public static final Holder<ArmorMaterial> COAL_ARMOR_MATERIAL = register("coal", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 3);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 4);
-            }), 8, 0f, 0f, () -> ModItems.HARDENED_COAL.get());
+    public static final ArmorMaterial RLAPIS_ARMOR_MATERIAL = create("rlapis",
+            slots(3, 6, 4, 4, 8), 17, 32, 1.6f, 0.15f, ItemTags.IRON_TOOL_MATERIALS);
 
-    /**
-     * Flint-Iron (FNI) armor — slightly less protective than vanilla iron.
-     * Iron: boots 2, legs 5, chest 6, helm 2 (total 15). FNI: 1/4/5/2 (total 12).
-     * Flint shards are sharp but the assembly is imperfect; enchantability matches iron.
-     */
-    public static final Holder<ArmorMaterial> FNI_ARMOR_MATERIAL = register("fni", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 9, 0.0f, 0.0f, () -> Items.FLINT);
+    /** Coal armor material — sits between leather and chainmail. */
+    public static final ArmorMaterial COAL_ARMOR_MATERIAL = create("coal",
+            slots(1, 2, 3, 1, 4), 8, 8, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
+
+    /** Flint-Iron (FNI) armor — slightly less protective than vanilla iron. */
+    public static final ArmorMaterial FNI_ARMOR_MATERIAL = create("fni",
+            slots(1, 4, 5, 2, 6), 13, 9, 0.0f, 0.0f, ItemTags.IRON_TOOL_MATERIALS);
 
     // ── Crystal / element polished armor materials (iron-level) ─────────────────
-    // Vanilla iron: boots 2, legs 5, chest 6, helm 2 = 15 pts, ×15 multiplier
-    // These sit at or just around vanilla iron, below any mod-custom material.
 
     /** Calcified Amethyst — iron-equivalent protection, higher enchantability. */
-    public static final Holder<ArmorMaterial> CAMETHYST_ARMOR_MATERIAL = register("camethyst", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 14, 0.5f, 0.0f, () -> ModItems.CALCIFIED_AMETHYST.get());
+    public static final ArmorMaterial CAMETHYST_ARMOR_MATERIAL = create("camethyst",
+            slots(2, 5, 6, 2, 7), 15, 14, 0.5f, 0.0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Glacial (Ice) — below chainmail protection; brittle and temporary. */
-    public static final Holder<ArmorMaterial> ICE_ARMOR_MATERIAL = register("ice", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 3);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 8, 0.0f, 0.0f, () -> ModItems.GLACIAL_SHARD.get());
+    public static final ArmorMaterial ICE_ARMOR_MATERIAL = create("ice",
+            slots(1, 3, 4, 1, 5), 10, 8, 0.0f, 0.0f, ItemTags.STONE_TOOL_MATERIALS);
 
     /** Polished Quartz — iron-equivalent protection, hardest of the polished set. */
-    public static final Holder<ArmorMaterial> PQUARTZ_ARMOR_MATERIAL = register("pquartz", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 10, 0.5f, 0.05f, () -> ModItems.POLISHED_QUARTZ.get());
+    public static final ArmorMaterial PQUARTZ_ARMOR_MATERIAL = create("pquartz",
+            slots(2, 5, 6, 2, 7), 16, 10, 0.5f, 0.05f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Polished Prismarine — iron-equivalent protection, ocean-enchanted. */
-    public static final Holder<ArmorMaterial> PPRISM_ARMOR_MATERIAL = register("pprism", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 12, 0.0f, 0.0f, () -> ModItems.POLISHED_PRISMARINE.get());
+    public static final ArmorMaterial PPRISM_ARMOR_MATERIAL = create("pprism",
+            slots(2, 5, 6, 2, 7), 14, 12, 0.0f, 0.0f, ItemTags.IRON_TOOL_MATERIALS);
 
-    /**
-     * Cake — practically useless armor. It's cake. You can eat it.
-     * Below leather protection; very low durability.
-     */
-    public static final Holder<ArmorMaterial> CAKE_ARMOR_MATERIAL = register("cake", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 0);
-                attribute.put(ArmorItem.Type.LEGGINGS, 1);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 1);
-                attribute.put(ArmorItem.Type.HELMET, 0);
-                attribute.put(ArmorItem.Type.BODY, 1);
-            }), 1, 0f, 0f, () -> Items.CAKE);
+    /** Cake — practically useless armor. */
+    public static final ArmorMaterial CAKE_ARMOR_MATERIAL = create("cake",
+            slots(0, 1, 1, 0, 1), 3, 1, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
     // ── Food armor materials (edible novelty sets) ────────────────────────────
 
-    public static final Holder<ArmorMaterial> BREAD_ARMOR_MATERIAL = register("bread", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 0);
-                attribute.put(ArmorItem.Type.LEGGINGS, 1);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 2);
-                attribute.put(ArmorItem.Type.HELMET, 0);
-                attribute.put(ArmorItem.Type.BODY, 1);
-            }), 2, 0f, 0f, () -> Items.BREAD);
+    public static final ArmorMaterial BREAD_ARMOR_MATERIAL = create("bread",
+            slots(0, 1, 2, 0, 1), 3, 2, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> DRIED_KELP_ARMOR_MATERIAL = register("dried_kelp", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 1);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 1);
-                attribute.put(ArmorItem.Type.HELMET, 0);
-                attribute.put(ArmorItem.Type.BODY, 1);
-            }), 1, 0f, 0f, () -> Items.DRIED_KELP);
+    public static final ArmorMaterial DRIED_KELP_ARMOR_MATERIAL = create("dried_kelp",
+            slots(1, 1, 1, 0, 1), 2, 1, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> ROTTEN_FLESH_ARMOR_MATERIAL = register("rotten_flesh", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 0);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 1);
-                attribute.put(ArmorItem.Type.HELMET, 0);
-                attribute.put(ArmorItem.Type.BODY, 1);
-            }), 3, 0f, 0f, () -> Items.ROTTEN_FLESH);
+    public static final ArmorMaterial ROTTEN_FLESH_ARMOR_MATERIAL = create("rotten_flesh",
+            slots(0, 2, 1, 0, 1), 2, 3, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> MELON_ARMOR_MATERIAL = register("melon", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 3);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 2);
-            }), 4, 0f, 0f, () -> Items.MELON_SLICE);
+    public static final ArmorMaterial MELON_ARMOR_MATERIAL = create("melon",
+            slots(1, 2, 3, 1, 2), 5, 4, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> SWEET_BERRY_ARMOR_MATERIAL = register("sweet_berry", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 2);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 2);
-            }), 5, 0f, 0f, () -> Items.SWEET_BERRIES);
+    public static final ArmorMaterial SWEET_BERRY_ARMOR_MATERIAL = create("sweet_berry",
+            slots(1, 2, 2, 1, 2), 4, 5, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> PUMPKIN_PIE_ARMOR_MATERIAL = register("pumpkin_pie", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 2);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 2);
-            }), 7, 0f, 0f, () -> Items.PUMPKIN_PIE);
+    public static final ArmorMaterial PUMPKIN_PIE_ARMOR_MATERIAL = create("pumpkin_pie",
+            slots(1, 2, 2, 2, 2), 4, 7, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> MUSHROOM_ARMOR_MATERIAL = register("mushroom", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 3);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 3);
-            }), 10, 0f, 0f, () -> Items.RED_MUSHROOM);
+    public static final ArmorMaterial MUSHROOM_ARMOR_MATERIAL = create("mushroom",
+            slots(1, 3, 4, 2, 3), 8, 10, 0f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> PUFFERFISH_ARMOR_MATERIAL = register("pufferfish", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 3);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 3);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 3);
-            }), 8, 0f, 0f, () -> Items.PUFFERFISH);
+    public static final ArmorMaterial PUFFERFISH_ARMOR_MATERIAL = create("pufferfish",
+            slots(1, 3, 3, 1, 3), 6, 8, 0f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> HONEY_ARMOR_MATERIAL = register("honey", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 3);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 3);
-            }), 10, 0f, 0f, () -> Items.HONEY_BOTTLE);
+    public static final ArmorMaterial HONEY_ARMOR_MATERIAL = create("honey",
+            slots(2, 3, 4, 2, 3), 10, 10, 0f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> CHORUS_FRUIT_ARMOR_MATERIAL = register("chorus_fruit", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 15, 0.5f, 0f, () -> Items.CHORUS_FRUIT);
+    public static final ArmorMaterial CHORUS_FRUIT_ARMOR_MATERIAL = create("chorus_fruit",
+            slots(2, 5, 6, 2, 5), 15, 15, 0.5f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
-    public static final Holder<ArmorMaterial> GOLDEN_APPLE_ARMOR_MATERIAL = register("golden_apple", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 22, 1.0f, 0f, () -> Items.GOLDEN_APPLE);
+    public static final ArmorMaterial GOLDEN_APPLE_ARMOR_MATERIAL = create("golden_apple",
+            slots(2, 5, 6, 3, 5), 18, 22, 1.0f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     // ── Vanilla material armor materials ───────────────────────────────────────
 
-    /** Rabbit Hide — weak leather-equivalent, bunny hop full set. */
-    public static final Holder<ArmorMaterial> RABBIT_HIDE_ARMOR_MATERIAL = register("rabbit_hide", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 3);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 3);
-            }), 12, 0f, 0f, () -> Items.RABBIT_HIDE);
+    /** Rabbit Hide — weak leather-equivalent. */
+    public static final ArmorMaterial RABBIT_HIDE_ARMOR_MATERIAL = create("rabbit_hide",
+            slots(1, 2, 3, 1, 3), 6, 12, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
     /** Cactus — prickly weak armor, thorns on hit. */
-    public static final Holder<ArmorMaterial> CACTUS_ARMOR_MATERIAL = register("cactus", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 3);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 3);
-            }), 5, 0f, 0f, () -> Items.CACTUS);
+    public static final ArmorMaterial CACTUS_ARMOR_MATERIAL = create("cactus",
+            slots(1, 2, 3, 1, 3), 5, 5, 0f, 0f, ItemTags.WOODEN_TOOL_MATERIALS);
 
     /** Bone — low-mid tier, undead bane synergy. */
-    public static final Holder<ArmorMaterial> BONE_ARMOR_MATERIAL = register("bone", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 3);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 4);
-            }), 6, 0f, 0f, () -> Items.BONE);
+    public static final ArmorMaterial BONE_ARMOR_MATERIAL = create("bone",
+            slots(1, 3, 4, 1, 4), 8, 6, 0f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
     /** Clay — low-mid tier, enchantable. */
-    public static final Holder<ArmorMaterial> CLAY_ARMOR_MATERIAL = register("clay", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 2);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 3);
-                attribute.put(ArmorItem.Type.HELMET, 1);
-                attribute.put(ArmorItem.Type.BODY, 3);
-            }), 8, 0f, 0f, () -> Items.CLAY_BALL);
+    public static final ArmorMaterial CLAY_ARMOR_MATERIAL = create("clay",
+            slots(1, 2, 3, 1, 3), 6, 8, 0f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
     /** Brick — stone-tier, durable and tough. */
-    public static final Holder<ArmorMaterial> BRICK_ARMOR_MATERIAL = register("brick", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 5, 0.5f, 0f, () -> Items.BRICK);
+    public static final ArmorMaterial BRICK_ARMOR_MATERIAL = create("brick",
+            slots(1, 4, 5, 2, 5), 12, 5, 0.5f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
     /** Nether Brick — stone-tier, fire-themed. */
-    public static final Holder<ArmorMaterial> NETHER_BRICK_ARMOR_MATERIAL = register("nether_brick", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 1);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 5, 0.5f, 0f, () -> Items.NETHER_BRICK);
+    public static final ArmorMaterial NETHER_BRICK_ARMOR_MATERIAL = create("nether_brick",
+            slots(1, 4, 5, 2, 5), 12, 5, 0.5f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
     /** Copper — stone-tier, oxidizes over time. */
-    public static final Holder<ArmorMaterial> COPPER_ARMOR_MATERIAL = register("copper", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 8, 0f, 0f, () -> Items.COPPER_INGOT);
+    public static final ArmorMaterial COPPER_ARMOR_MATERIAL = create("copper",
+            slots(2, 4, 5, 2, 5), 12, 8, 0f, 0f, ItemTags.STONE_TOOL_MATERIALS);
 
     /** Phantom Membrane — upper-mid tier, slow falling. */
-    public static final Holder<ArmorMaterial> PHANTOM_ARMOR_MATERIAL = register("phantom", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 12, 0f, 0f, () -> Items.PHANTOM_MEMBRANE);
+    public static final ArmorMaterial PHANTOM_ARMOR_MATERIAL = create("phantom",
+            slots(2, 4, 5, 2, 5), 10, 12, 0f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Magma Cream — upper-mid tier, fire protection. */
-    public static final Holder<ArmorMaterial> MAGMA_CREAM_ARMOR_MATERIAL = register("magma_cream", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 4);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 5);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 5);
-            }), 8, 0.5f, 0f, () -> Items.MAGMA_CREAM);
+    public static final ArmorMaterial MAGMA_CREAM_ARMOR_MATERIAL = create("magma_cream",
+            slots(2, 4, 5, 2, 5), 10, 8, 0.5f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Slime — upper-mid tier, bouncy. */
-    public static final Holder<ArmorMaterial> SLIME_ARMOR_MATERIAL = register("slime", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 3);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 4);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 4);
-            }), 10, 0f, 0.1f, () -> Items.SLIME_BALL);
+    public static final ArmorMaterial SLIME_ARMOR_MATERIAL = create("slime",
+            slots(2, 3, 4, 2, 4), 8, 10, 0f, 0.1f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Blaze Rod — iron-level, fire resistance. */
-    public static final Holder<ArmorMaterial> BLAZE_ARMOR_MATERIAL = register("blaze", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 10, 0.5f, 0f, () -> Items.BLAZE_ROD);
+    public static final ArmorMaterial BLAZE_ARMOR_MATERIAL = create("blaze",
+            slots(2, 5, 6, 2, 6), 14, 10, 0.5f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Nautilus Shell — iron-level, conduit affinity. */
-    public static final Holder<ArmorMaterial> NAUTILUS_ARMOR_MATERIAL = register("nautilus", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 14, 0.5f, 0f, () -> Items.NAUTILUS_SHELL);
+    public static final ArmorMaterial NAUTILUS_ARMOR_MATERIAL = create("nautilus",
+            slots(2, 5, 6, 2, 6), 14, 14, 0.5f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Purpur — iron-level, ender resilience. */
-    public static final Holder<ArmorMaterial> PURPUR_ARMOR_MATERIAL = register("purpur", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 12, 0.5f, 0f, () -> Items.POPPED_CHORUS_FRUIT);
+    public static final ArmorMaterial PURPUR_ARMOR_MATERIAL = create("purpur",
+            slots(2, 5, 6, 2, 6), 14, 12, 0.5f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Ghast Tear — above-iron, regeneration. */
-    public static final Holder<ArmorMaterial> GHAST_TEAR_ARMOR_MATERIAL = register("ghast_tear", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 18, 1.0f, 0f, () -> Items.GHAST_TEAR);
+    public static final ArmorMaterial GHAST_TEAR_ARMOR_MATERIAL = create("ghast_tear",
+            slots(2, 5, 6, 3, 6), 16, 18, 1.0f, 0f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Eye of Ender — above-iron, ender sight. */
-    public static final Holder<ArmorMaterial> EYE_OF_ENDER_ARMOR_MATERIAL = register("eye_of_ender", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 7);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 6);
-            }), 20, 1.0f, 0.05f, () -> Items.ENDER_EYE);
+    public static final ArmorMaterial EYE_OF_ENDER_ARMOR_MATERIAL = create("eye_of_ender",
+            slots(2, 5, 7, 3, 6), 16, 20, 1.0f, 0.05f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Shulker Shell — above-iron, levitation shield. */
-    public static final Holder<ArmorMaterial> SHULKER_ARMOR_MATERIAL = register("shulker", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 3);
-                attribute.put(ArmorItem.Type.LEGGINGS, 6);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 7);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 16, 1.5f, 0.1f, () -> Items.SHULKER_SHELL);
+    public static final ArmorMaterial SHULKER_ARMOR_MATERIAL = create("shulker",
+            slots(3, 6, 7, 3, 7), 18, 16, 1.5f, 0.1f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Turtle Scute — diamond-adjacent, ocean guardian. */
-    public static final Holder<ArmorMaterial> TURTLE_SCUTE_ARMOR_MATERIAL = register("turtle_scute", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 7);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 16, 1.5f, 0.05f, () -> Items.TURTLE_SCUTE);
+    public static final ArmorMaterial TURTLE_SCUTE_ARMOR_MATERIAL = create("turtle_scute",
+            slots(2, 5, 7, 3, 7), 20, 16, 1.5f, 0.05f, ItemTags.IRON_TOOL_MATERIALS);
 
     /** Echo Shard — diamond-adjacent, sculk resonance. */
-    public static final Holder<ArmorMaterial> ECHO_SHARD_ARMOR_MATERIAL = register("echo_shard", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 3);
-                attribute.put(ArmorItem.Type.LEGGINGS, 6);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 7);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 18, 2.0f, 0.05f, () -> Items.ECHO_SHARD);
+    public static final ArmorMaterial ECHO_SHARD_ARMOR_MATERIAL = create("echo_shard",
+            slots(3, 6, 7, 3, 7), 22, 18, 2.0f, 0.05f, ItemTags.DIAMOND_TOOL_MATERIALS);
 
     /** Dragon's Breath — endgame, draconic aura. */
-    public static final Holder<ArmorMaterial> DRAGON_BREATH_ARMOR_MATERIAL = register("dragon_breath", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 3);
-                attribute.put(ArmorItem.Type.LEGGINGS, 6);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 8);
-                attribute.put(ArmorItem.Type.HELMET, 3);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 20, 2.5f, 0.1f, () -> Items.DRAGON_BREATH);
+    public static final ArmorMaterial DRAGON_BREATH_ARMOR_MATERIAL = create("dragon_breath",
+            slots(3, 6, 8, 3, 7), 25, 20, 2.5f, 0.1f, ItemTags.DIAMOND_TOOL_MATERIALS);
 
-    /**
-     * Ectoplasm — iron-equivalent protection with slight toughness bonus.
-     * Spectral armor grants ghost avoidance when worn as a full set.
-     */
-    public static final Holder<ArmorMaterial> ECTO_ARMOR_MATERIAL = register("ecto", Util.make(new EnumMap<>(ArmorItem.Type.class),
-            attribute -> {
-                attribute.put(ArmorItem.Type.BOOTS, 2);
-                attribute.put(ArmorItem.Type.LEGGINGS, 5);
-                attribute.put(ArmorItem.Type.CHESTPLATE, 6);
-                attribute.put(ArmorItem.Type.HELMET, 2);
-                attribute.put(ArmorItem.Type.BODY, 7);
-            }), 16, 0.5f, 0.0f, () -> ModItems.REFINED_ECTOPLASM.get());
+    /** Ectoplasm — iron-equivalent protection with slight toughness bonus. */
+    public static final ArmorMaterial ECTO_ARMOR_MATERIAL = create("ecto",
+            slots(2, 5, 6, 2, 7), 16, 16, 0.5f, 0.0f, ItemTags.IRON_TOOL_MATERIALS);
 
-    private static Holder<ArmorMaterial> register(String name, EnumMap<ArmorItem.Type, Integer> typeProtection,
-                                                  int enchantability, float toughness, float knockbackResistance,
-                                                  Supplier<Item> ingredientItem) {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, name);
-        Holder<SoundEvent> equipSound = SoundEvents.ARMOR_EQUIP_GENERIC;
-        Supplier<Ingredient> ingredient = () -> Ingredient.of(ingredientItem.get());
-        List<ArmorMaterial.Layer> layers = List.of(new ArmorMaterial.Layer(location));
+    // ── helpers ─────────────────────────────────────────────────────────────
 
-        EnumMap<ArmorItem.Type, Integer> typeMap = new EnumMap<>(ArmorItem.Type.class);
-        for (ArmorItem.Type type : ArmorItem.Type.values()) {
-            typeMap.put(type, typeProtection.get(type));
-        }
+    /** Constructs an asset-key for a material — points at assets/usefultoolsmod/equipment/<id>.json. */
+    public static ResourceKey<EquipmentAsset> assetKey(String id) {
+        return ResourceKey.create(EquipmentAssets.ROOT_ID,
+                Identifier.fromNamespaceAndPath(UsefultoolsMod.MOD_ID, id));
+    }
 
-        return Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, location,
-                new ArmorMaterial(typeProtection, enchantability, equipSound, ingredient, layers, toughness, knockbackResistance));
+    private static EnumMap<ArmorType, Integer> slots(int boots, int leggings, int chestplate, int helmet, int body) {
+        EnumMap<ArmorType, Integer> m = new EnumMap<>(ArmorType.class);
+        m.put(ArmorType.BOOTS, boots);
+        m.put(ArmorType.LEGGINGS, leggings);
+        m.put(ArmorType.CHESTPLATE, chestplate);
+        m.put(ArmorType.HELMET, helmet);
+        m.put(ArmorType.BODY, body);
+        return m;
+    }
+
+    private static ArmorMaterial create(String id, EnumMap<ArmorType, Integer> protection,
+                                        int durability, int enchantability, float toughness,
+                                        float knockbackResistance, TagKey<Item> repairTag) {
+        return new ArmorMaterial(
+                durability,
+                Util.make(new EnumMap<>(ArmorType.class), m -> m.putAll(protection)),
+                enchantability,
+                SoundEvents.ARMOR_EQUIP_GENERIC,
+                toughness,
+                knockbackResistance,
+                repairTag,
+                assetKey(id)
+        );
     }
 }

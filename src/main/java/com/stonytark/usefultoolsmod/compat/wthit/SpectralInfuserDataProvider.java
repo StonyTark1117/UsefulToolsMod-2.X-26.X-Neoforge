@@ -14,12 +14,12 @@ public class SpectralInfuserDataProvider implements IDataProvider<SpectralInfuse
     public void appendData(IDataWriter data, IServerAccessor<SpectralInfuserBlockEntity> accessor,
                            IPluginConfig config) {
         SpectralInfuserBlockEntity be = accessor.getTarget();
-        var handler = be.getItemHandler();
+        var items = be.getItems();
         var containerData = be.getData();
 
-        ItemStack input = handler.getStackInSlot(0);
-        ItemStack fuel = handler.getStackInSlot(1);
-        ItemStack output = handler.getStackInSlot(2);
+        ItemStack input = items.get(0);
+        ItemStack fuel = items.get(1);
+        ItemStack output = items.get(2);
 
         CompoundTag tag = data.raw();
         tag.putInt("utm_progress", containerData.get(0));

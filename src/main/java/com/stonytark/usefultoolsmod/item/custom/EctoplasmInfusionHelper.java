@@ -21,7 +21,7 @@ public final class EctoplasmInfusionHelper {
         if (isEctoItem(stack.getItem())) return true;
         CustomData data = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
         if (data.isEmpty()) return false;
-        return data.copyTag().getBoolean(TAG_KEY);
+        return data.copyTag().getBooleanOr(TAG_KEY, false);
     }
 
     /** Returns true if the item is an ecto tool class (always considered infused). */

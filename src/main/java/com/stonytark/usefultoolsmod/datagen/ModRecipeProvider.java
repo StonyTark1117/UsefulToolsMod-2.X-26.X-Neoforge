@@ -14,64 +14,83 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends RecipeProvider {
-    public ModRecipeProvider(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pRegistries) {
-        super(pOutput, pRegistries);
+    private final RecipeOutput pRecipeOutput;
+
+    public ModRecipeProvider(HolderLookup.Provider pRegistries, RecipeOutput pOutput) {
+        super(pRegistries, pOutput);
+        this.pRecipeOutput = pOutput;
+    }
+
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pRegistries) {
+            super(pOutput, pRegistries);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+            return new ModRecipeProvider(registries, output);
+        }
+
+        @Override
+        public String getName() {
+            return "UsefulToolsMod Recipes";
+        }
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput pRecipeOutput) {
+    protected void buildRecipes() {
         List<ItemLike> RGOLD_SMELTABLES = List.of(ModItems.RAW_RGOLD.get(), ModBlocks.RGOLDORE.get(), ModBlocks.RGOLD_END_ORE.get(), ModBlocks.RGOLD_NETHER_ORE.get(), ModBlocks.RGOLD_DEEPSLATE_ORE.get());
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RGOLDBLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.RGOLDBLOCK.get())
                 .pattern("AAA")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.HRBLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.HRBLOCK.get())
                 .pattern("AAA")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.HRED.get())
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.SEMBLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.SEMBLOCK.get())
                 .pattern("AAA")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.SOBLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.SOBLOCK.get())
                 .pattern("AAA")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.OBINGOT.get())
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.LBLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.LBLOCK.get())
                 .pattern("AAA")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.RLAPIS.get())
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, Blocks.ICE)
+        this.shaped(RecipeCategory.BUILDING_BLOCKS, Blocks.ICE)
                 .pattern("SSS")
                 .pattern("SSS")
                 .pattern("SSS")
                 .define('S', Items.SNOWBALL)
                 .unlockedBy(getHasName(Items.SNOWBALL), has(Items.SNOWBALL)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.RLAPIS.get())
+        this.shaped(RecipeCategory.MISC, ModItems.RLAPIS.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
                 .define('A', Items.IRON_NUGGET).define('B', Items.LAPIS_LAZULI)
                 .unlockedBy(getHasName(Items.LAPIS_LAZULI), has(Items.LAPIS_LAZULI)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.HRED.get())
+        this.shaped(RecipeCategory.MISC, ModItems.HRED.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
@@ -79,812 +98,812 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE)).save(pRecipeOutput);
 
         // Hardened Glowstone: 4 glowstone dust in a + around a blaze rod
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.HGLOW.get())
+        this.shaped(RecipeCategory.MISC, ModItems.HGLOW.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
                 .define('A', Items.GLOWSTONE_DUST).define('B', Items.BLAZE_ROD)
                 .unlockedBy(getHasName(Items.GLOWSTONE_DUST), has(Items.GLOWSTONE_DUST)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SEM.get())
+        this.shaped(RecipeCategory.MISC, ModItems.SEM.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
                 .define('A', Items.IRON_INGOT).define('B', Items.EMERALD)
                 .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.OBINGOT.get())
+        this.shaped(RecipeCategory.MISC, ModItems.OBINGOT.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
                 .define('A', Items.IRON_INGOT).define('B', ModItems.OBSHARD.get())
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.RGOLD.get())
+        this.shaped(RecipeCategory.MISC, ModItems.RGOLD.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
                 .define('A', Items.IRON_NUGGET).define('B', Items.GOLD_INGOT)
                 .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RGOLDORE.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.RGOLDORE.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
                 .define('A', Items.STONE).define('B', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":reverse_rgoldore");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RGOLD_END_ORE.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.RGOLD_END_ORE.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
                 .define('A', Items.END_STONE).define('B', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":reverse_rgold_end_ore");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RGOLD_NETHER_ORE.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.RGOLD_NETHER_ORE.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
                 .define('A', Items.NETHERRACK).define('B', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":reverse_rgold_nether_ore");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RGOLD_DEEPSLATE_ORE.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.RGOLD_DEEPSLATE_ORE.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
                 .define('A', Items.COBBLED_DEEPSLATE).define('B', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":reverse_rgold_deepslate_ore");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', Items.EMERALD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.EMERALD), has(Items.EMERALD)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', Items.EMERALD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.EMERALD), has(Items.EMERALD)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', Items.EMERALD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.EMERALD), has(Items.EMERALD)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', Items.EMERALD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.EMERALD), has(Items.EMERALD)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.REMERALD_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', Items.EMERALD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.EMERALD), has(Items.EMERALD)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.SEM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.SEM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.SEM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.SEM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PEMERALD_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.SEM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.OBINGOT.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.OBINGOT.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.OBINGOT.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.OBINGOT.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.POBSIDIAN_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.OBINGOT.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.OBSHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.OBSHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.OBSHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.OBSHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ROBSIDIAN_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.OBSHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_AXE.get())
                 .pattern("AAE")
                 .pattern("DBD")
                 .pattern("CB ")
                 .define('C', ModBlocks.SOBLOCK.get()).define('B', Items.STICK).define('A', Blocks.DIAMOND_BLOCK).define('D', ModItems.RGOLD.get()).define('E', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModBlocks.SOBLOCK.get()), has(ModBlocks.SOBLOCK.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_SHOVEL.get())
                 .pattern("EAE")
                 .pattern("DBD")
                 .pattern("CB ")
                 .define('C', ModBlocks.SOBLOCK.get()).define('B', Items.STICK).define('A', Blocks.DIAMOND_BLOCK).define('D', ModItems.RGOLD.get()).define('E', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModBlocks.SOBLOCK.get()), has(ModBlocks.SOBLOCK.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_PICKAXE.get())
                 .pattern("AAA")
                 .pattern("DBE")
                 .pattern("CB ")
                 .define('C', ModBlocks.SOBLOCK.get()).define('B', Items.STICK).define('A', Blocks.DIAMOND_BLOCK).define('D', ModItems.RGOLD.get()).define('E', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModBlocks.SOBLOCK.get()), has(ModBlocks.SOBLOCK.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.OVERPOWER_SWORD.get())
                 .pattern("EAE")
                 .pattern("DAD")
                 .pattern("CB ")
                 .define('C', ModBlocks.SOBLOCK.get()).define('B', Items.STICK).define('A', Blocks.DIAMOND_BLOCK).define('D', ModItems.RGOLD.get()).define('E', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModBlocks.SOBLOCK.get()), has(ModBlocks.SOBLOCK.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.HRED.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.HRED.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.HRED.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.HRED.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HREDSTONE_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.HRED.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.HGLOW.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.HGLOW.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.HGLOW.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.HGLOW.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.HGLOWSTONE_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.HGLOW.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RGOLD_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.RLAPIS.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.RLAPIS.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.RLAPIS.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.RLAPIS.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RLAPIS_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.RLAPIS.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.EMERALD_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.SEM.get())
                 .unlockedBy(getHasName(ModItems.SEM.get()), has(ModItems.SEM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HRED_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HRED_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.HRED.get())
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HRED_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HRED_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.HRED.get())
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HRED_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HRED_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.HRED.get())
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HRED_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HRED_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.HRED.get())
                 .unlockedBy(getHasName(ModItems.HRED.get()), has(ModItems.HRED.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.HGLOW.get())
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.HGLOW.get())
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.HGLOW.get())
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.HGLOW_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.HGLOW.get())
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.OBINGOT.get())
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.OBINGOT.get())
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.OBINGOT.get())
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OBSIDIAN_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.OBINGOT.get())
                 .unlockedBy(getHasName(ModItems.OBINGOT.get()), has(ModItems.OBINGOT.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RGOLD_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RGOLD.get()), has(ModItems.RGOLD.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.RLAPIS.get())
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.RLAPIS.get())
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.RLAPIS.get())
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RLAPIS_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.RLAPIS.get())
                 .unlockedBy(getHasName(ModItems.RLAPIS.get()), has(ModItems.RLAPIS.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_CHESTPLATE.get())
                 .pattern("ACA")
                 .pattern("ABA")
                 .pattern("ADB")
                 .define('A', Items.DIAMOND_BLOCK).define('B', ModItems.OBINGOT.get()).define('C', ModItems.SEM.get()).define('D', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(Items.DIAMOND_BLOCK), has(Items.DIAMOND_BLOCK)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_BOOTS.get())
                 .pattern("ACA")
                 .pattern("ABA")
                 .pattern(" D ")
                 .define('A', Items.DIAMOND_BLOCK).define('B', ModItems.OBINGOT.get()).define('C', ModItems.SEM.get()).define('D', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(Items.DIAMOND_BLOCK), has(Items.DIAMOND_BLOCK)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("ACA")
                 .define('A', Items.DIAMOND_BLOCK).define('B', ModItems.OBINGOT.get()).define('C', ModItems.SEM.get())
                 .unlockedBy(getHasName(Items.DIAMOND_BLOCK), has(Items.DIAMOND_BLOCK)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.OVERPOWER_HELMET.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("CDC")
                 .define('A', Items.DIAMOND_BLOCK).define('B', ModItems.OBINGOT.get()).define('C', ModItems.SEM.get()).define('D', ModItems.RGOLD.get())
                 .unlockedBy(getHasName(Items.DIAMOND_BLOCK), has(Items.DIAMOND_BLOCK)).save(pRecipeOutput);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RGOLD.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.RGOLD.get(), 9)
                 .requires(ModBlocks.RGOLDBLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.RGOLDBLOCK.get()), has(ModBlocks.RGOLDBLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":rgold_from_block");
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.HRED.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.HRED.get(), 9)
                 .requires(ModBlocks.HRBLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.HRBLOCK.get()), has(ModBlocks.HRBLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":hred_from_block");
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.OBINGOT.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.OBINGOT.get(), 9)
                 .requires(ModBlocks.SOBLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.SOBLOCK.get()), has(ModBlocks.SOBLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":sobingot_from_block");
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RLAPIS.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.RLAPIS.get(), 9)
                 .requires(ModBlocks.LBLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.LBLOCK.get()), has(ModBlocks.LBLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":rlapis_from_block");
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.OBSHARD.get(), 3)
+        this.shapeless(RecipeCategory.MISC, ModItems.OBSHARD.get(), 3)
                 .requires(Items.OBSIDIAN)
                 .unlockedBy(getHasName(Items.OBSIDIAN), has(Items.OBSIDIAN))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":obshard_from_block");
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SEM.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.SEM.get(), 9)
                 .requires(ModBlocks.SEMBLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.SEMBLOCK.get()), has(ModBlocks.SEMBLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":sem_from_block");
 
         // Hardened Glowstone Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.HGLOW_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.HGLOW_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.HGLOW.get())
                 .unlockedBy(getHasName(ModItems.HGLOW.get()), has(ModItems.HGLOW.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.HGLOW.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.HGLOW.get(), 9)
                 .requires(ModBlocks.HGLOW_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.HGLOW_BLOCK.get()), has(ModBlocks.HGLOW_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":hglow_from_block");
 
         // Raw Ferrous Gold Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RAW_RGOLD_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.RAW_RGOLD_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.RAW_RGOLD.get())
                 .unlockedBy(getHasName(ModItems.RAW_RGOLD.get()), has(ModItems.RAW_RGOLD.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RAW_RGOLD.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.RAW_RGOLD.get(), 9)
                 .requires(ModBlocks.RAW_RGOLD_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.RAW_RGOLD_BLOCK.get()), has(ModBlocks.RAW_RGOLD_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":raw_rgold_from_block");
 
         // Ectoplasm Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.ECTOPLASM_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.ECTOPLASM_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.ECTOPLASM.get())
                 .unlockedBy(getHasName(ModItems.ECTOPLASM.get()), has(ModItems.ECTOPLASM.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ECTOPLASM.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.ECTOPLASM.get(), 9)
                 .requires(ModBlocks.ECTOPLASM_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.ECTOPLASM_BLOCK.get()), has(ModBlocks.ECTOPLASM_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":ectoplasm_from_block");
 
         // Refined Ectoplasm Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.REFINED_ECTOPLASM_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.REFINED_ECTOPLASM_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.REFINED_ECTOPLASM.get())
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.REFINED_ECTOPLASM.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.REFINED_ECTOPLASM.get(), 9)
                 .requires(ModBlocks.REFINED_ECTOPLASM_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.REFINED_ECTOPLASM_BLOCK.get()), has(ModBlocks.REFINED_ECTOPLASM_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":refined_ectoplasm_from_block");
 
         // Hardened Coal Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.HARDENED_COAL_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.HARDENED_COAL_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.HARDENED_COAL.get())
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.HARDENED_COAL.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.HARDENED_COAL.get(), 9)
                 .requires(ModBlocks.HARDENED_COAL_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.HARDENED_COAL_BLOCK.get()), has(ModBlocks.HARDENED_COAL_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":hardened_coal_from_block");
 
         // Coal Dust Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.COAL_DUST_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.COAL_DUST_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.COAL_DUST.get())
                 .unlockedBy(getHasName(ModItems.COAL_DUST.get()), has(ModItems.COAL_DUST.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.COAL_DUST.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.COAL_DUST.get(), 9)
                 .requires(ModBlocks.COAL_DUST_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.COAL_DUST_BLOCK.get()), has(ModBlocks.COAL_DUST_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":coal_dust_from_block");
 
         // Obsidian Shard Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.OBSHARD_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.OBSHARD_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.OBSHARD.get())
                 .unlockedBy(getHasName(ModItems.OBSHARD.get()), has(ModItems.OBSHARD.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.OBSHARD.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.OBSHARD.get(), 9)
                 .requires(ModBlocks.OBSHARD_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.OBSHARD_BLOCK.get()), has(ModBlocks.OBSHARD_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":obshard_from_obshard_block");
 
         // Calcified Amethyst Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.CALCIFIED_AMETHYST_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.CALCIFIED_AMETHYST_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get())
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.CALCIFIED_AMETHYST.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.CALCIFIED_AMETHYST.get(), 9)
                 .requires(ModBlocks.CALCIFIED_AMETHYST_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.CALCIFIED_AMETHYST_BLOCK.get()), has(ModBlocks.CALCIFIED_AMETHYST_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":calcified_amethyst_from_block");
 
         // Glacial Shard Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.GLACIAL_SHARD_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.GLACIAL_SHARD_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.GLACIAL_SHARD.get())
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.GLACIAL_SHARD.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.GLACIAL_SHARD.get(), 9)
                 .requires(ModBlocks.GLACIAL_SHARD_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.GLACIAL_SHARD_BLOCK.get()), has(ModBlocks.GLACIAL_SHARD_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":glacial_shard_from_block");
 
         // Polished Quartz Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.POLISHED_QUARTZ_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.POLISHED_QUARTZ_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.POLISHED_QUARTZ.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.POLISHED_QUARTZ.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.POLISHED_QUARTZ.get(), 9)
                 .requires(ModBlocks.POLISHED_QUARTZ_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.POLISHED_QUARTZ_BLOCK.get()), has(ModBlocks.POLISHED_QUARTZ_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":polished_quartz_from_block");
 
         // Polished Prismarine Block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.POLISHED_PRISMARINE_BLOCK.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.POLISHED_PRISMARINE_BLOCK.get())
                 .pattern("AAA").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.POLISHED_PRISMARINE.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.POLISHED_PRISMARINE.get(), 9)
+        this.shapeless(RecipeCategory.MISC, ModItems.POLISHED_PRISMARINE.get(), 9)
                 .requires(ModBlocks.POLISHED_PRISMARINE_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.POLISHED_PRISMARINE_BLOCK.get()), has(ModBlocks.POLISHED_PRISMARINE_BLOCK.get()))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":polished_prismarine_from_block");
 
-        oreSmelting(pRecipeOutput, RGOLD_SMELTABLES, RecipeCategory.MISC, ModItems.RGOLD.get(), 0.25f, 200, "rgold");
-        oreBlasting(pRecipeOutput, RGOLD_SMELTABLES, RecipeCategory.MISC, ModItems.RGOLD.get(), 0.25f, 100, "rgold");
+        oreSmeltingLocal(pRecipeOutput, RGOLD_SMELTABLES, RecipeCategory.MISC, ModItems.RGOLD.get(), 0.25f, 200, "rgold");
+        oreBlastingLocal(pRecipeOutput, RGOLD_SMELTABLES, RecipeCategory.MISC, ModItems.RGOLD.get(), 0.25f, 100, "rgold");
 
         // -----------------------------------------------------------------
         // Raw metal rough tool recipes
         // -----------------------------------------------------------------
 
         // Rough Raw Gold tools
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.RAW_GOLD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_GOLD), has(Items.RAW_GOLD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_GOLD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_GOLD), has(Items.RAW_GOLD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_GOLD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_GOLD), has(Items.RAW_GOLD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.RAW_GOLD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_GOLD), has(Items.RAW_GOLD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_GOLD_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_GOLD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_GOLD), has(Items.RAW_GOLD)).save(pRecipeOutput);
 
         // Rough Raw Copper tools
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.RAW_COPPER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_COPPER), has(Items.RAW_COPPER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_COPPER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_COPPER), has(Items.RAW_COPPER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_COPPER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_COPPER), has(Items.RAW_COPPER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.RAW_COPPER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_COPPER), has(Items.RAW_COPPER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_COPPER_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_COPPER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_COPPER), has(Items.RAW_COPPER)).save(pRecipeOutput);
 
         // Rough Raw Iron tools
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.RAW_IRON).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_IRON), has(Items.RAW_IRON)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_IRON).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_IRON), has(Items.RAW_IRON)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_IRON).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_IRON), has(Items.RAW_IRON)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.RAW_IRON).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_IRON), has(Items.RAW_IRON)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_IRON_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.RAW_IRON).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.RAW_IRON), has(Items.RAW_IRON)).save(pRecipeOutput);
 
         // Rough Raw Ferrous Gold tools
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', ModItems.RAW_RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RAW_RGOLD.get()), has(ModItems.RAW_RGOLD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.RAW_RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RAW_RGOLD.get()), has(ModItems.RAW_RGOLD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.RAW_RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RAW_RGOLD.get()), has(ModItems.RAW_RGOLD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', ModItems.RAW_RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RAW_RGOLD.get()), has(ModItems.RAW_RGOLD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RRAW_RGOLD_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.RAW_RGOLD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.RAW_RGOLD.get()), has(ModItems.RAW_RGOLD.get())).save(pRecipeOutput);
 
         // Rough Netherite Scrap tools
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.NETHERITE_SCRAP).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.NETHERITE_SCRAP).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.NETHERITE_SCRAP).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.NETHERITE_SCRAP).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RSCRAP_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.NETHERITE_SCRAP).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP)).save(pRecipeOutput);
@@ -893,14 +912,14 @@ public class ModRecipeProvider extends RecipeProvider {
         // Ghost breeding item
         // -----------------------------------------------------------------
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ECTOPLASM.get(), 2)
+        this.shapeless(RecipeCategory.MISC, ModItems.ECTOPLASM.get(), 2)
                 .requires(Items.PHANTOM_MEMBRANE)
                 .requires(Items.GLOWSTONE_DUST)
                 .unlockedBy(getHasName(Items.PHANTOM_MEMBRANE), has(Items.PHANTOM_MEMBRANE))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":ectoplasm_from_membrane");
 
         // Spectral Infuser block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.SPECTRAL_INFUSER.get())
+        this.shaped(RecipeCategory.MISC, ModBlocks.SPECTRAL_INFUSER.get())
                 .pattern("EEE")
                 .pattern("EBE")
                 .pattern("SSS")
@@ -915,7 +934,7 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
 
         // Refined Ectoplasm: 4 ectoplasm (cross) + 1 diamond (center)
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.REFINED_ECTOPLASM.get())
+        this.shaped(RecipeCategory.MISC, ModItems.REFINED_ECTOPLASM.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
@@ -925,35 +944,35 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(pRecipeOutput);
 
         // Rough Ecto tools (raw ectoplasm)
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RECTO_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RECTO_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.ECTOPLASM.get()), has(ModItems.ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RECTO_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RECTO_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.ECTOPLASM.get()), has(ModItems.ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RECTO_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RECTO_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.ECTOPLASM.get()), has(ModItems.ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RECTO_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RECTO_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.ECTOPLASM.get()), has(ModItems.ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RECTO_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RECTO_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -961,35 +980,35 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.ECTOPLASM.get()), has(ModItems.ECTOPLASM.get())).save(pRecipeOutput);
 
         // Ecto tools (refined ectoplasm)
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ECTO_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ECTO_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
                 .define('A', ModItems.REFINED_ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ECTO_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ECTO_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.REFINED_ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ECTO_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ECTO_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
                 .define('A', ModItems.REFINED_ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ECTO_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ECTO_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
                 .define('A', ModItems.REFINED_ECTOPLASM.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ECTO_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ECTO_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -997,28 +1016,28 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
         // Ecto armor
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ECTO_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ECTO_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
                 .define('A', ModItems.REFINED_ECTOPLASM.get())
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ECTO_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ECTO_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
                 .define('A', ModItems.REFINED_ECTOPLASM.get())
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ECTO_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ECTO_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
                 .define('A', ModItems.REFINED_ECTOPLASM.get())
                 .unlockedBy(getHasName(ModItems.REFINED_ECTOPLASM.get()), has(ModItems.REFINED_ECTOPLASM.get())).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ECTO_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ECTO_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
@@ -1030,19 +1049,19 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
 
         // 1 Coal → 4 Coal Dust
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.COAL_DUST.get(), 4)
+        this.shapeless(RecipeCategory.MISC, ModItems.COAL_DUST.get(), 4)
                 .requires(Items.COAL)
                 .unlockedBy(getHasName(Items.COAL), has(Items.COAL))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":coal_dust_from_coal");
 
         // 1 Charcoal → 4 Coal Dust
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.COAL_DUST.get(), 4)
+        this.shapeless(RecipeCategory.MISC, ModItems.COAL_DUST.get(), 4)
                 .requires(Items.CHARCOAL)
                 .unlockedBy(getHasName(Items.CHARCOAL), has(Items.CHARCOAL))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":coal_dust_from_charcoal");
 
         // Hardened Coal = Coal Dust surrounded by Clay Balls (follows HRED pattern)
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.HARDENED_COAL.get())
+        this.shaped(RecipeCategory.MISC, ModItems.HARDENED_COAL.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
@@ -1055,7 +1074,7 @@ public class ModRecipeProvider extends RecipeProvider {
         // Coal tools
         // -----------------------------------------------------------------
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.COAL_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.COAL_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
@@ -1063,7 +1082,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.COAL_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.COAL_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -1071,7 +1090,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.COAL_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.COAL_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -1079,7 +1098,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.COAL_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.COAL_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
@@ -1087,7 +1106,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.COAL_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.COAL_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -1099,7 +1118,7 @@ public class ModRecipeProvider extends RecipeProvider {
         // Coal armor
         // -----------------------------------------------------------------
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COAL_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.COAL_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
@@ -1107,7 +1126,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COAL_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.COAL_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
@@ -1115,7 +1134,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COAL_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.COAL_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
@@ -1123,7 +1142,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.HARDENED_COAL.get()), has(ModItems.HARDENED_COAL.get()))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COAL_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.COAL_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
@@ -1134,23 +1153,23 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Leather tools
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.LEATHER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.LEATHER), has(Items.LEATHER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.LEATHER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.LEATHER), has(Items.LEATHER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.LEATHER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.LEATHER), has(Items.LEATHER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.LEATHER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.LEATHER), has(Items.LEATHER)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.LEATHER_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.LEATHER).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.LEATHER), has(Items.LEATHER)).save(pRecipeOutput);
@@ -1159,7 +1178,7 @@ public class ModRecipeProvider extends RecipeProvider {
         // Cake tools + armor
         // -----------------------------------------------------------------
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAKE_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAKE_SWORD.get())
                 .pattern(" A ")
                 .pattern(" A ")
                 .pattern(" B ")
@@ -1167,7 +1186,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAKE_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAKE_PICKAXE.get())
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -1175,7 +1194,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAKE_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAKE_SHOVEL.get())
                 .pattern(" A ")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -1183,7 +1202,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAKE_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAKE_AXE.get())
                 .pattern("AA ")
                 .pattern("AB ")
                 .pattern(" B ")
@@ -1191,7 +1210,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAKE_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAKE_HOE.get())
                 .pattern("AA ")
                 .pattern(" B ")
                 .pattern(" B ")
@@ -1199,7 +1218,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAKE_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAKE_HELMET.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("   ")
@@ -1207,7 +1226,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAKE_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAKE_CHESTPLATE.get())
                 .pattern("A A")
                 .pattern("AAA")
                 .pattern("AAA")
@@ -1215,7 +1234,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAKE_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAKE_LEGGINGS.get())
                 .pattern("AAA")
                 .pattern("A A")
                 .pattern("A A")
@@ -1223,7 +1242,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.CAKE), has(Items.CAKE))
                 .save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAKE_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAKE_BOOTS.get())
                 .pattern("   ")
                 .pattern("A A")
                 .pattern("A A")
@@ -1315,37 +1334,37 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // Armor-only sets
         // Rabbit Hide armor
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_HELMET.get())
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', Items.RABBIT_HIDE)
                 .unlockedBy(getHasName(Items.RABBIT_HIDE), has(Items.RABBIT_HIDE)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_CHESTPLATE.get())
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', Items.RABBIT_HIDE)
                 .unlockedBy(getHasName(Items.RABBIT_HIDE), has(Items.RABBIT_HIDE)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_LEGGINGS.get())
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', Items.RABBIT_HIDE)
                 .unlockedBy(getHasName(Items.RABBIT_HIDE), has(Items.RABBIT_HIDE)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.RABBIT_HIDE_BOOTS.get())
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', Items.RABBIT_HIDE)
                 .unlockedBy(getHasName(Items.RABBIT_HIDE), has(Items.RABBIT_HIDE)).save(pRecipeOutput);
 
         // Turtle Scute armor
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_HELMET.get())
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', Items.TURTLE_SCUTE)
                 .unlockedBy(getHasName(Items.TURTLE_SCUTE), has(Items.TURTLE_SCUTE)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_CHESTPLATE.get())
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', Items.TURTLE_SCUTE)
                 .unlockedBy(getHasName(Items.TURTLE_SCUTE), has(Items.TURTLE_SCUTE)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_LEGGINGS.get())
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', Items.TURTLE_SCUTE)
                 .unlockedBy(getHasName(Items.TURTLE_SCUTE), has(Items.TURTLE_SCUTE)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.TURTLE_SCUTE_BOOTS.get())
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', Items.TURTLE_SCUTE)
                 .unlockedBy(getHasName(Items.TURTLE_SCUTE), has(Items.TURTLE_SCUTE)).save(pRecipeOutput);
@@ -1458,7 +1477,7 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
 
         // Calcified Amethyst: + pattern with amethyst shards around calcite
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CALCIFIED_AMETHYST.get())
+        this.shaped(RecipeCategory.MISC, ModItems.CALCIFIED_AMETHYST.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
@@ -1468,7 +1487,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(pRecipeOutput);
 
         // Glacial Shard: packed ice surrounding blue ice
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GLACIAL_SHARD.get())
+        this.shaped(RecipeCategory.MISC, ModItems.GLACIAL_SHARD.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("AAA")
@@ -1478,19 +1497,19 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(pRecipeOutput);
 
         // Blue Ice → 9 Packed Ice (reverse of vanilla 9 packed → 1 blue)
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.PACKED_ICE, 9)
+        this.shapeless(RecipeCategory.MISC, Items.PACKED_ICE, 9)
                 .requires(Items.BLUE_ICE)
                 .unlockedBy(getHasName(Items.BLUE_ICE), has(Items.BLUE_ICE))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":packed_ice_from_blue_ice");
 
         // Packed Ice → 9 Ice (reverse of vanilla 9 ice → 1 packed)
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.ICE, 9)
+        this.shapeless(RecipeCategory.MISC, Items.ICE, 9)
                 .requires(Items.PACKED_ICE)
                 .unlockedBy(getHasName(Items.PACKED_ICE), has(Items.PACKED_ICE))
                 .save(pRecipeOutput, UsefultoolsMod.MOD_ID + ":ice_from_packed_ice");
 
         // Polished Quartz: + pattern with quartz around smooth quartz block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.POLISHED_QUARTZ.get())
+        this.shaped(RecipeCategory.MISC, ModItems.POLISHED_QUARTZ.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
@@ -1500,7 +1519,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(pRecipeOutput);
 
         // Polished Prismarine: + pattern with prismarine shards around prismarine crystals
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.POLISHED_PRISMARINE.get())
+        this.shaped(RecipeCategory.MISC, ModItems.POLISHED_PRISMARINE.get())
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
@@ -1512,23 +1531,23 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Rough Amethyst tools
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.AMETHYST_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.AMETHYST_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.AMETHYST_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.AMETHYST_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RAMETHYST_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.AMETHYST_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD)).save(pRecipeOutput);
@@ -1536,23 +1555,23 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Snow tools
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SNOW_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.SNOW_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.SNOWBALL).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.SNOWBALL), has(Items.SNOWBALL)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SNOW_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.SNOW_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.SNOWBALL).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.SNOWBALL), has(Items.SNOWBALL)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SNOW_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.SNOW_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.SNOWBALL).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.SNOWBALL), has(Items.SNOWBALL)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SNOW_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.SNOW_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.SNOWBALL).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.SNOWBALL), has(Items.SNOWBALL)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SNOW_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.SNOW_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.SNOWBALL).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.SNOWBALL), has(Items.SNOWBALL)).save(pRecipeOutput);
@@ -1560,23 +1579,23 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Rough Quartz tools
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.QUARTZ).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.QUARTZ), has(Items.QUARTZ)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.QUARTZ).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.QUARTZ), has(Items.QUARTZ)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.QUARTZ).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.QUARTZ), has(Items.QUARTZ)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.QUARTZ).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.QUARTZ), has(Items.QUARTZ)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RQUARTZ_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.QUARTZ).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.QUARTZ), has(Items.QUARTZ)).save(pRecipeOutput);
@@ -1584,23 +1603,23 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Rough Prismarine tools
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', Items.PRISMARINE_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.PRISMARINE_SHARD), has(Items.PRISMARINE_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', Items.PRISMARINE_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.PRISMARINE_SHARD), has(Items.PRISMARINE_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', Items.PRISMARINE_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.PRISMARINE_SHARD), has(Items.PRISMARINE_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', Items.PRISMARINE_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.PRISMARINE_SHARD), has(Items.PRISMARINE_SHARD)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.RPRISM_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', Items.PRISMARINE_SHARD).define('B', Items.STICK)
                 .unlockedBy(getHasName(Items.PRISMARINE_SHARD), has(Items.PRISMARINE_SHARD)).save(pRecipeOutput);
@@ -1608,39 +1627,39 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Calcified Amethyst tools + armor
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.CAMETHYST_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_HELMET.get())
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get())
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_CHESTPLATE.get())
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get())
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_LEGGINGS.get())
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get())
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.CAMETHYST_BOOTS.get())
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', ModItems.CALCIFIED_AMETHYST.get())
                 .unlockedBy(getHasName(ModItems.CALCIFIED_AMETHYST.get()), has(ModItems.CALCIFIED_AMETHYST.get())).save(pRecipeOutput);
@@ -1648,39 +1667,39 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Ice (Glacial) tools + armor
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ICE_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ICE_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', ModItems.GLACIAL_SHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ICE_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ICE_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.GLACIAL_SHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ICE_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ICE_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.GLACIAL_SHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ICE_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ICE_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', ModItems.GLACIAL_SHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.ICE_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.ICE_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.GLACIAL_SHARD.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ICE_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ICE_HELMET.get())
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', ModItems.GLACIAL_SHARD.get())
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ICE_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ICE_CHESTPLATE.get())
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.GLACIAL_SHARD.get())
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ICE_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ICE_LEGGINGS.get())
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', ModItems.GLACIAL_SHARD.get())
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ICE_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.ICE_BOOTS.get())
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', ModItems.GLACIAL_SHARD.get())
                 .unlockedBy(getHasName(ModItems.GLACIAL_SHARD.get()), has(ModItems.GLACIAL_SHARD.get())).save(pRecipeOutput);
@@ -1688,39 +1707,39 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Polished Quartz tools + armor
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', ModItems.POLISHED_QUARTZ.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.POLISHED_QUARTZ.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.POLISHED_QUARTZ.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', ModItems.POLISHED_QUARTZ.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PQUARTZ_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.POLISHED_QUARTZ.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_HELMET.get())
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', ModItems.POLISHED_QUARTZ.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_CHESTPLATE.get())
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.POLISHED_QUARTZ.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_LEGGINGS.get())
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', ModItems.POLISHED_QUARTZ.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PQUARTZ_BOOTS.get())
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', ModItems.POLISHED_QUARTZ.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_QUARTZ.get()), has(ModItems.POLISHED_QUARTZ.get())).save(pRecipeOutput);
@@ -1728,39 +1747,39 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Polished Prismarine tools + armor
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_SWORD.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_SWORD.get())
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', ModItems.POLISHED_PRISMARINE.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_PICKAXE.get())
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.POLISHED_PRISMARINE.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_SHOVEL.get())
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.POLISHED_PRISMARINE.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_AXE.get())
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', ModItems.POLISHED_PRISMARINE.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.PPRISM_HOE.get())
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', ModItems.POLISHED_PRISMARINE.get()).define('B', Items.STICK)
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_HELMET.get())
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', ModItems.POLISHED_PRISMARINE.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_CHESTPLATE.get())
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', ModItems.POLISHED_PRISMARINE.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_LEGGINGS.get())
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', ModItems.POLISHED_PRISMARINE.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.PPRISM_BOOTS.get())
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', ModItems.POLISHED_PRISMARINE.get())
                 .unlockedBy(getHasName(ModItems.POLISHED_PRISMARINE.get()), has(ModItems.POLISHED_PRISMARINE.get())).save(pRecipeOutput);
@@ -1777,27 +1796,27 @@ public class ModRecipeProvider extends RecipeProvider {
         // Flint-Iron (FNI) Tools
         // -----------------------------------------------------------------
         // Sword: flint-iron-stick vertically
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FNI_SWORD.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.FNI_SWORD.get())
                 .pattern(" F ").pattern(" I ").pattern(" S ")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT).define('S', Items.STICK)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
         // Pickaxe: iron-flint-iron top, two sticks
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.FNI_PICKAXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.FNI_PICKAXE.get())
                 .pattern("IFI").pattern(" S ").pattern(" S ")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT).define('S', Items.STICK)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
         // Shovel: iron head, flint below, stick handle
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.FNI_SHOVEL.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.FNI_SHOVEL.get())
                 .pattern(" I ").pattern(" F ").pattern(" S ")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT).define('S', Items.STICK)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
         // Axe: flint-iron upper-left corner + stick column
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.FNI_AXE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.FNI_AXE.get())
                 .pattern("FI ").pattern("FS ").pattern(" S ")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT).define('S', Items.STICK)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
         // Hoe: flint-iron head, two sticks below centre
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.FNI_HOE.get())
+        this.shaped(RecipeCategory.TOOLS, ModItems.FNI_HOE.get())
                 .pattern("FI ").pattern(" S ").pattern(" S ")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT).define('S', Items.STICK)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
@@ -1805,19 +1824,19 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Flint-Iron (FNI) Armor  — iron base with flint accent
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FNI_HELMET.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.FNI_HELMET.get())
                 .pattern("IFI").pattern("I I").pattern("   ")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FNI_CHESTPLATE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.FNI_CHESTPLATE.get())
                 .pattern("I I").pattern("IFI").pattern("III")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FNI_LEGGINGS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.FNI_LEGGINGS.get())
                 .pattern("IFI").pattern("I I").pattern("I I")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FNI_BOOTS.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.FNI_BOOTS.get())
                 .pattern("   ").pattern("IFI").pattern("I I")
                 .define('F', Items.FLINT).define('I', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.FLINT), has(Items.FLINT)).save(pRecipeOutput);
@@ -1857,7 +1876,7 @@ public class ModRecipeProvider extends RecipeProvider {
         // -----------------------------------------------------------------
         // Grenade & Dynamite
         // -----------------------------------------------------------------
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.GRENADE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.GRENADE.get())
                 .pattern("ACA").pattern("ABA").pattern("ADA")
                 .define('A', Items.IRON_INGOT)
                 .define('B', Items.GUNPOWDER)
@@ -1865,7 +1884,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('D', Items.PAPER)
                 .unlockedBy(getHasName(Items.GUNPOWDER), has(Items.GUNPOWDER)).save(pRecipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.DYNAMITE.get())
+        this.shaped(RecipeCategory.COMBAT, ModItems.DYNAMITE.get())
                 .pattern(" B ").pattern("CBC").pattern(" A ")
                 .define('A', Items.PAPER)
                 .define('B', Items.STRING)
@@ -1873,45 +1892,45 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.GRENADE.get()), has(ModItems.GRENADE.get())).save(pRecipeOutput);
     }
 
-    private static void stoneVariantTools(RecipeOutput out, ItemLike sword, ItemLike pickaxe, ItemLike shovel, ItemLike axe, ItemLike hoe, ItemLike material) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, sword)
+    private void stoneVariantTools(RecipeOutput out, ItemLike sword, ItemLike pickaxe, ItemLike shovel, ItemLike axe, ItemLike hoe, ItemLike material) {
+        this.shaped(RecipeCategory.COMBAT, sword)
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(getHasName(material), has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, pickaxe)
+        this.shaped(RecipeCategory.TOOLS, pickaxe)
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(getHasName(material), has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, shovel)
+        this.shaped(RecipeCategory.TOOLS, shovel)
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(getHasName(material), has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, axe)
+        this.shaped(RecipeCategory.TOOLS, axe)
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(getHasName(material), has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, hoe)
+        this.shaped(RecipeCategory.TOOLS, hoe)
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(getHasName(material), has(material)).save(out);
     }
 
-    protected static void oreSmelting(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,
-                                      float pExperience, int pCookingTIme, String pGroup) {
-        oreCooking(recipeOutput, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new, pIngredients, pCategory, pResult,
-                pExperience, pCookingTIme, pGroup, "_from_smelting");
+    protected void oreSmeltingLocal(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,
+                                      float pExperience, int pCookingTime, String pGroup) {
+        oreCookingLocal(recipeOutput, SmeltingRecipe::new, pIngredients, pCategory, pResult,
+                pExperience, pCookingTime, pGroup, "_from_smelting");
     }
 
-    protected static void oreBlasting(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,
+    protected void oreBlastingLocal(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,
                                       float pExperience, int pCookingTime, String pGroup) {
-        oreCooking(recipeOutput, RecipeSerializer.BLASTING_RECIPE, BlastingRecipe::new, pIngredients, pCategory, pResult,
+        oreCookingLocal(recipeOutput, BlastingRecipe::new, pIngredients, pCategory, pResult,
                 pExperience, pCookingTime, pGroup, "_from_blasting");
     }
 
-    protected static <T extends AbstractCookingRecipe> void oreCooking(RecipeOutput recipeOutput, RecipeSerializer<T> pCookingSerializer, AbstractCookingRecipe.Factory<T> factory,
+    protected <T extends AbstractCookingRecipe> void oreCookingLocal(RecipeOutput recipeOutput, AbstractCookingRecipe.Factory<T> factory,
                                                                        List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup, String pRecipeName) {
         for(ItemLike itemlike : pIngredients) {
-            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemlike), pCategory, pResult, pExperience, pCookingTime, pCookingSerializer, factory).group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike))
+            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemlike), pCategory, CookingBookCategory.MISC, pResult, pExperience, pCookingTime, factory).group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike))
                     .save(recipeOutput, UsefultoolsMod.MOD_ID + ":" + getItemName(pResult) + pRecipeName + "_" + getItemName(itemlike));
         }
     }
@@ -1920,39 +1939,39 @@ public class ModRecipeProvider extends RecipeProvider {
                               ItemLike sword, ItemLike pickaxe, ItemLike shovel, ItemLike axe, ItemLike hoe,
                               ItemLike helmet, ItemLike chestplate, ItemLike leggings, ItemLike boots) {
         String name = getHasName(material);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, sword)
+        this.shaped(RecipeCategory.TOOLS, sword)
                 .pattern(" A ").pattern(" A ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, pickaxe)
+        this.shaped(RecipeCategory.TOOLS, pickaxe)
                 .pattern("AAA").pattern(" B ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, shovel)
+        this.shaped(RecipeCategory.TOOLS, shovel)
                 .pattern(" A ").pattern(" B ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, axe)
+        this.shaped(RecipeCategory.TOOLS, axe)
                 .pattern("AA ").pattern("AB ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, hoe)
+        this.shaped(RecipeCategory.TOOLS, hoe)
                 .pattern("AA ").pattern(" B ").pattern(" B ")
                 .define('A', material).define('B', Items.STICK)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, helmet)
+        this.shaped(RecipeCategory.COMBAT, helmet)
                 .pattern("AAA").pattern("A A").pattern("   ")
                 .define('A', material)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, chestplate)
+        this.shaped(RecipeCategory.COMBAT, chestplate)
                 .pattern("A A").pattern("AAA").pattern("AAA")
                 .define('A', material)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, leggings)
+        this.shaped(RecipeCategory.COMBAT, leggings)
                 .pattern("AAA").pattern("A A").pattern("A A")
                 .define('A', material)
                 .unlockedBy(name, has(material)).save(out);
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, boots)
+        this.shaped(RecipeCategory.COMBAT, boots)
                 .pattern("   ").pattern("A A").pattern("A A")
                 .define('A', material)
                 .unlockedBy(name, has(material)).save(out);

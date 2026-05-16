@@ -1,14 +1,13 @@
 package com.stonytark.usefultoolsmod.client;
 
 
-import net.neoforged.fml.common.EventBusSubscriber;
 import com.stonytark.usefultoolsmod.entity.ModEntities;
 import com.stonytark.usefultoolsmod.entity.client.GhostModel;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class ModEntityRenderers {

@@ -13,9 +13,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -25,9 +26,8 @@ import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -93,7 +93,9 @@ public class GhostEntity extends Animal {
     protected PathNavigation createNavigation(Level level) {
         FlyingPathNavigation nav = new FlyingPathNavigation(this, level);
         nav.setCanFloat(true);
-        nav.setCanPassDoors(true);
+        // 1.21.5+: setCanPassDoors moved off the navigation; it's now on the NodeEvaluator
+        // exposed via `nav.getNodeEvaluator().setCanPassDoors(true)`.
+        nav.getNodeEvaluator().setCanPassDoors(true);
         return nav;
     }
 
@@ -110,7 +112,7 @@ public class GhostEntity extends Animal {
     /* --------------- Spawn rules --------------- */
 
     public static boolean checkGhostSpawnRules(EntityType<? extends Animal> type, LevelAccessor level,
-                                               MobSpawnType reason, BlockPos pos, RandomSource random) {
+                                               EntitySpawnReason reason, BlockPos pos, RandomSource random) {
         // Honor config kill-switch and natural-spawn rate. Only natural spawns
         // run this predicate — spawn eggs / /summon / breeding bypass it, so
         // those paths always succeed regardless of ghostSpawnChance.
@@ -132,7 +134,7 @@ public class GhostEntity extends Animal {
     public void tick() {
         super.tick();
 
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             this.clearFire();
             constrainPosition();
 
@@ -189,7 +191,8 @@ public class GhostEntity extends Animal {
 
         if (bestDir != null) {
             // Air is reachable — push gently toward it so the ghost slides out naturally
-            Vec3 push = Vec3.atLowerCornerOf(bestDir.getNormal()).normalize().scale(0.15 / bestDist);
+            // 1.21.5+: Direction#getNormal() was renamed to #getUnitVec3i().
+            Vec3 push = Vec3.atLowerCornerOf(bestDir.getUnitVec3i()).normalize().scale(0.15 / bestDist);
             Vec3 current = this.getDeltaMovement();
             this.setDeltaMovement(
                     current.x * 0.6 + push.x,
@@ -224,7 +227,8 @@ public class GhostEntity extends Animal {
     }
 
     @Override
-    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(double fallDistance, float multiplier, DamageSource source) {
+        // 1.21.5+: causeFallDamage's first arg is double, not float.
         return false;
     }
 
@@ -239,7 +243,8 @@ public class GhostEntity extends Animal {
     }
 
     @Override
-    public boolean isInvulnerableTo(DamageSource source) {
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        // 1.21.5+: isInvulnerableTo now takes a ServerLevel.
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) return false;
 
         // Allow damage from ectoplasm-infused weapons
@@ -255,18 +260,22 @@ public class GhostEntity extends Animal {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        // 1.21.5+: Entity#hurt went final; mobs override hurtServer(ServerLevel, ...) instead.
         // Non-weapon infused tools deal practically no damage (half a heart)
         Entity attacker = source.getEntity();
         if (attacker instanceof LivingEntity living) {
             ItemStack weapon = living.getMainHandItem();
+            // Mod's own ecto/coal/cake axes extend plain Item now (not AxeItem), so we tag-check
+            // instead of instanceof to keep parity with the 1.21.1 behavior where any axe deals
+            // full damage to ghosts.
             if (EctoplasmInfusionHelper.isInfused(weapon)
-                    && !(weapon.getItem() instanceof SwordItem)
-                    && !(weapon.getItem() instanceof AxeItem)) {
+                    && !weapon.has(DataComponents.WEAPON)
+                    && !weapon.is(ItemTags.AXES)) {
                 amount = 1.0f; // half a heart
             }
         }
-        return super.hurt(source, amount);
+        return super.hurtServer(level, source, amount);
     }
 
     @Override
@@ -281,13 +290,15 @@ public class GhostEntity extends Animal {
             count = 1 + this.random.nextInt(3);
         }
         if (count > 0) {
-            this.spawnAtLocation(new ItemStack(ModItems.ECTOPLASM.get(), count));
+            // 1.21.5+: spawnAtLocation now requires a ServerLevel arg (the death-loot hook gives us one).
+            this.spawnAtLocation(level, new ItemStack(ModItems.ECTOPLASM.get(), count));
         }
     }
 
     @Nullable
     public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
-        return (AgeableMob) ModEntities.GHOST.get().create(pLevel);
+        // 1.21.5+: EntityType.create takes (Level, EntitySpawnReason).
+        return (AgeableMob) ModEntities.GHOST.get().create(pLevel, net.minecraft.world.entity.EntitySpawnReason.BREEDING);
     }
 
     public boolean isFood(ItemStack pStack) {

@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class SpectralInfuserMenu extends AbstractContainerMenu {
     private final SpectralInfuserBlockEntity blockEntity;
@@ -35,10 +34,20 @@ public class SpectralInfuserMenu extends AbstractContainerMenu {
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
 
-        // Block entity slots
-        this.addSlot(new SlotItemHandler(be.getItemHandler(), 0, 56, 17));   // input (top)
-        this.addSlot(new SlotItemHandler(be.getItemHandler(), 1, 56, 53));   // ectoplasm (bottom)
-        this.addSlot(new SlotItemHandler(be.getItemHandler(), 2, 116, 35) {  // output (right)
+        // Block entity slots — use the Container directly
+        this.addSlot(new Slot(be, 0, 56, 17) {                                  // input (top)
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return be.isItemValidForSlot(0, stack);
+            }
+        });
+        this.addSlot(new Slot(be, 1, 56, 53) {                                  // ectoplasm (bottom)
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return be.isItemValidForSlot(1, stack);
+            }
+        });
+        this.addSlot(new Slot(be, 2, 116, 35) {                                 // output (right)
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false; // output-only

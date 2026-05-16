@@ -1,15 +1,14 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 
-public class EdibleHoeItem extends HoeItem {
+public class EdibleHoeItem extends Item {
 
-    public EdibleHoeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EdibleHoeItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

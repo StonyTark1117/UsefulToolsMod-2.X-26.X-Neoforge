@@ -1,13 +1,12 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
 
-public class EctoPickaxeItem extends PickaxeItem {
+public class EctoPickaxeItem extends Item {
 
-    public EctoPickaxeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public EctoPickaxeItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

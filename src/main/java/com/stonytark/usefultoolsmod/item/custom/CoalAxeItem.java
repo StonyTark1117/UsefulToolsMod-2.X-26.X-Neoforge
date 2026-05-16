@@ -1,13 +1,12 @@
 package com.stonytark.usefultoolsmod.item.custom;
 
-import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
 
-public class CoalAxeItem extends AxeItem {
+public class CoalAxeItem extends Item {
 
-    public CoalAxeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public CoalAxeItem(Item.Properties properties) {
+        super(properties);
     }
 
     @Override

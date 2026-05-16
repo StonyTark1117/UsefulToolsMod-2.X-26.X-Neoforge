@@ -4,20 +4,35 @@ import com.stonytark.usefultoolsmod.UsefultoolsMod;
 import com.stonytark.usefultoolsmod.item.ModItems;
 import com.stonytark.usefultoolsmod.util.ModTags;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ModItemTagProvider extends ItemTagsProvider {
-    public ModItemTagProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> completableFuture,
-                              CompletableFuture<TagLookup<Block>> lookupCompletableFuture, @Nullable ExistingFileHelper existingFileHelper) {
-        super(packOutput, completableFuture, lookupCompletableFuture, UsefultoolsMod.MOD_ID, existingFileHelper);
+/**
+ * Item tag provider. 26.1 dropped the NeoForge {@code ItemTagsProvider} that took an
+ * {@code ExistingFileHelper} plus a block-tag lookup; we extend the vanilla
+ * {@link IntrinsicHolderTagsProvider} directly. The {@code TagLookup<Block>} parameter is
+ * passed in so item tags can copy entries from sibling block tags (delivered via
+ * {@code GatherDataEvent#createBlockAndItemTags}).
+ */
+public class ModItemTagProvider extends IntrinsicHolderTagsProvider<Item> {
+    public ModItemTagProvider(PackOutput packOutput,
+                              CompletableFuture<HolderLookup.Provider> lookupProvider,
+                              CompletableFuture<TagsProvider.TagLookup<Block>> blockTagLookup) {
+        super(packOutput, Registries.ITEM, lookupProvider,
+                item -> BuiltInRegistries.ITEM.getResourceKey(item).orElseThrow(),
+                UsefultoolsMod.MOD_ID);
+        // blockTagLookup is unused; this mod doesn't copy block tags into item tags. The
+        // signature still accepts it so GatherDataEvent#createBlockAndItemTags can hand it in.
     }
 
 
