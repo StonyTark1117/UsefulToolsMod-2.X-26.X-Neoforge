@@ -14,7 +14,8 @@ A simple Minecraft mod adding various tools and armor based on reinforced versio
 ## Compatibility
 
 - **Minecraft:** 26.1.2
-- **Loader:** NeoForge 26.1.0.1-beta+
+- **Loader:** NeoForge 26.1.2.55-beta+ (built and tested against this version; older
+  26.1.0.x betas don't satisfy JEI 29.5.0.28's lower bound)
 - **Java:** 25 (toolchain configured automatically via foojay-resolver)
 
 ### Optional integrations

@@ -20,7 +20,7 @@ authors="${mod_authors}" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://www.curseforge.com/minecraft/mc-mods/the-useful-tools-mod" #optional
 # A URL to refer people to when problems occur with this mod
-issueTrackerURL="https://github.com/StonyTark1117/UsefulToolsMod-2.X-Neoforge/issues" #optional
+issueTrackerURL="https://github.com/StonyTark1117/UsefulToolsMod-2.X-26.X-Neoforge/issues" #optional
 # The description text for the mod (multi line!)
 description='''${mod_description}'''
 
