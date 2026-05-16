@@ -43,8 +43,12 @@ public class ModAdvancementProvider extends AdvancementProvider {
     // -----------------------------------------------------------------------
     static class UsefulToolsAdvancements implements AdvancementSubProvider {
 
+        // 26.1: advancement backgrounds switched from "textures/<path>.png" file paths
+        // to sprite identifiers under "gui/advancements/backgrounds/<name>" (the vanilla
+        // adventure/nether/end/husbandry/stone set). "nether" is the rocky-red look that
+        // the old "textures/block/netherrack.png" was reaching for.
         private static final Identifier BACKGROUND =
-                Identifier.withDefaultNamespace("textures/block/netherrack.png");
+                Identifier.withDefaultNamespace("gui/advancements/backgrounds/nether");
 
         /** Captured from {@link #generate} so the {@code static} helper methods that build
          *  per-set advancements (e.g. {@code buildFoodAdv}) can still resolve item holders

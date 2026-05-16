@@ -1,4 +1,4 @@
-// 26.1.2	2026-05-15T15:12:35.701131261	Advancements
+// 26.1.2	2026-05-15T21:54:24.395006051	Advancements
 8dceb4f3d3b404479941e33f190ae1ca6a12d626 data/usefultoolsmod/advancement/blaze_craft.json
 e91e759500557e005859629715d1ef82475aacc1 data/usefultoolsmod/advancement/blaze_set.json
 a8227cf08e44b3a4b181607c12dcdec16af7ac88 data/usefultoolsmod/advancement/bone_craft.json
@@ -129,7 +129,7 @@ f4bf1512ea6c68b39c3be84d8303fa8ef89d2509 data/usefultoolsmod/advancement/rgold_a
 fee65d832704ddc0cfc859fe3da36e4b31482e12 data/usefultoolsmod/advancement/rlapis_armor.json
 73615cc2bbde7fca573f302ae64908715875d001 data/usefultoolsmod/advancement/rlapis_tools.json
 66aeca470f1c39603883fbd54591e3436aefb499 data/usefultoolsmod/advancement/robsidian.json
-21532bbe939de9975dfc2268256266db1c48325a data/usefultoolsmod/advancement/root.json
+b40b8921d3dc56994891f131202627eb06a79aef data/usefultoolsmod/advancement/root.json
 9153094cae3eb334a244b8907b600bbae1a4cf2d data/usefultoolsmod/advancement/rotten_flesh_craft.json
 784fdce00b8a2df2d698b9fb7cefe15c2a72baa6 data/usefultoolsmod/advancement/rotten_flesh_eat.json
 d2acd47bc834a363a62ccc83e02dfff4289b5620 data/usefultoolsmod/advancement/rotten_flesh_full_set.json
